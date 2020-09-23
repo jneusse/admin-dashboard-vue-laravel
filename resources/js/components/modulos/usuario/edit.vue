@@ -78,6 +78,21 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group row">
+                                        <label for="" class="col-md-3 col-form-label">Rol</label>
+                                        <div class="col-md-9">
+                                              <el-select v-model="fillEditarUsuario.nIdRol" placeholder="Select" clearable>
+                                                <el-option
+                                                v-for="item in listRoles"
+                                                :key="item.id"
+                                                :label="item.name"
+                                                :value="item.id">
+                                                </el-option>
+                                            </el-select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
                                         <label for="" class="col-md-3 col-form-label">Fotografia</label>
                                         <div class="col-md-9">
                                             <input type="file" class="form-control" @change="getFile">
@@ -132,8 +147,10 @@ export default {
                 cUsuario: '',
                 cCorreo: '',
                 cContrasena: '',
-                oFotografia: ''
+                oFotografia: '',
+                nIdRol: ''
             },
+            listRoles: [],
             form: new FormData,
             fullscreenLoading: false,
             modalShow: false,
@@ -150,8 +167,30 @@ export default {
     },
     mounted(){
         this.getUsuarioById();
+        this.getListaRoles()
+        this.getRolByUsuario()
     },
     methods:{
+        getListaRoles(){
+            let url = '/administracion/rol/getListaRoles'
+            axios.get(url)
+            .then( res => {
+                //console.log(res.data)
+                this.listRoles = res.data
+            })
+        },
+        getRolByUsuario(){
+            let url = '/administracion/usuario/getRolByUsuario'
+            let params = {
+                'nIdUsuario': this.fillEditarUsuario.nIdUsuario
+            }
+            axios.get(url, {
+                params: params
+            })
+            .then( res => {
+                this.fillEditarUsuario.nIdRol = (res.data.length == 0) ? '' : res.data[0].nIdRol
+            })
+        },
         getUsuarioById(){
             let url = '/administracion/usuario/getListaUsuarios'
             let params = {
@@ -162,7 +201,7 @@ export default {
                 params: params
             })
             .then( res => {
-                console.log(res.data[0])
+                // console.log(res.data[0])
                 let usuario = res.data[0]
                 this.fillEditarUsuario.cPrimerNombre = usuario.firstname,
                 this.fillEditarUsuario.cSegundoNombre = usuario.secondname,
@@ -227,6 +266,7 @@ export default {
                         showConfirmButton: false,
                         timer: 1500
                     })
+                    this.setEditarRolByUsuario()
                     //this.$router.push('/usuario')
                 })
 
@@ -266,6 +306,21 @@ export default {
                 this.error = true
             }
             return this.error
+        },
+        setEditarRolByUsuario(){
+            let url = '/administracion/usuario/setEditarRolByUsuario'
+            this.fullscreenLoading = true
+            axios.post(url, {
+                'nIdUsuario': this.fillEditarUsuario.nIdUsuario,
+                'nIdRol': this.fillEditarUsuario.nIdRol
+
+                })
+                .then(res=>{
+                    console.log(res)
+                    this.fullscreenLoading = false
+                    // this.$router.push('/usuario')
+                })
+
         }
     }
 }

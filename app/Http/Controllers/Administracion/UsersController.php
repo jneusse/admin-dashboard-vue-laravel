@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Exception;
+
 
 class UsersController extends Controller
 {
@@ -125,6 +127,90 @@ class UsersController extends Controller
             $nIdUsuario,
             $nIdRol
         ]);
+
+        return $rpta;
+    }
+    public function getRolByUsuario(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        $nIdUsuario = $request->nIdUsuario;
+
+        $nIdUsuario = ($nIdUsuario == NULL) ? ($nIdUsuario = 0) : $nIdUsuario;
+
+
+        $rpta = DB::select('call sp_Usuario_getRolByUsuario(?)', [
+            $nIdUsuario
+        ]);
+
+        return $rpta;
+    }
+    public function getListarPermisosByRol(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        $nIdUsuario = $request->nIdUsuario;
+
+        $nIdUsuario = ($nIdUsuario == NULL) ? ($nIdUsuario = 0) : $nIdUsuario;
+
+
+        $rpta = DB::select('call sp_Usuario_getListarPermisosByRol(?)', [
+            $nIdUsuario
+        ]);
+
+        return $rpta;
+    }
+    public function getListarPermisosByUsuario(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        $nIdUsuario = $request->nIdUsuario;
+
+        $nIdUsuario = ($nIdUsuario == NULL) ? ($nIdUsuario = 0) : $nIdUsuario;
+
+
+        $rpta = DB::select('call sp_Usuario_getListarPermisosByUsuario(?)', [
+            $nIdUsuario
+        ]);
+
+        return $rpta;
+    }
+    public function setRegistrarPermisosByUsuario(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        $nIdUsuario = $request->nIdUsuario;
+
+        $nIdUsuario = ($nIdUsuario == NULL) ? ($nIdUsuario = 0) : $nIdUsuario;
+
+
+        try {
+            DB::beginTransaction();
+
+            $rpta = DB::select('call sp_Usuario_setElimiarPermisosByUsuario(?)',[
+                $nIdUsuario
+            ]);
+
+            $listPermisos = $request->listPermisosFilter;
+            $listPermisosSize = sizeof($listPermisos);
+            if($listPermisosSize > 0){
+                foreach ($listPermisos as $key => $value) {
+                    if($value['checked'] == true ){
+                        DB::select('call sp_Rol_setRegistrarPermisosByUsuario( ?, ?)',[
+                            $nIdUsuario,
+                            $value['id']
+                        ]);
+                    }
+                }
+            }
+            DB::commit();
+
+        } catch (Exception $e) {
+            //throw $th;
+            DB::rollback();
+            return ('error');
+
+        }
 
         return $rpta;
     }
