@@ -14,14 +14,27 @@
             <div class="sidebar">
             <!-- Sidebar user (optional) -->
             <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                <div class="image">
-                <img :src="ruta + '/img/user2-160x160.jpg'" class="img-circle elevation-2" alt="User Image">
-                </div>
+                <template v-if="!usuario.file_id">
+                    <div class="image">
+                        <img :src="ruta + '/img/user2-160x160.jpg'" class="img-circle elevation-2" alt="User Image">
+                    </div>
+                </template>
+                <template v-else>
+                    <div class="image">
+                        <img :src="usuario.file.path" class="img-circle elevation-2" alt="User Image">
+                    </div>
+                </template>
                 <div class="info">
-                <router-link :to="'/'" class="d-block">Yisus Code</router-link>
+                <router-link :to="{name: 'usuario.ver', params:{id: usuario.id}}" class="d-block">{{ usuario.fullname }}</router-link>
                 </div>
             </div>
-
+             <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                <div class="info">
+                    <a href="#" class="d-block" @click="logout" v-loading.fullscreen.lock="fullscreenLoading">
+                        <i class="fas fa-sign-out-alf"></i>
+                        Sign out</a>
+                </div>
+            </div>
             <!-- Sidebar Menu -->
             <nav class="mt-2">z
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
@@ -102,7 +115,26 @@
 
 <script>
 export default {
-    props: ['ruta']
+    props: ['ruta', 'usuario'],
+    data(){
+        return{
+            fullscreenLoading: false
+        }
+    },
+    methods:{
+        logout(){
+            this.fullscreenLoading = true
+            var url = '/authenticate/logout'
+            console.log('logout')
+            axios.post(url).then(res=>{
+                if(res.data.code == 204 ){
+                    this.$router.push({name: 'login'})
+                    location.reload()
+                    // this.fullscreenLoading = false
+                }
+            })
+        }
+    }
 }
 </script>
 

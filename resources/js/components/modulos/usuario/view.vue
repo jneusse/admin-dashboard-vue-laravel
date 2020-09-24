@@ -4,7 +4,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="m-0 text-dark">Usuario</h1>
+                        <h1 class="m-0 text-dark">Usuario </h1>
                     </div><!-- /.col -->
                 </div><!-- /.row -->
             </div><!-- /.container-fluid -->
@@ -24,7 +24,7 @@
                                 </template>
                             </div>
                             <h3 class="profile-username text-center">{{ cNombreCompleto }}</h3>
-                            <p class="text-muted text-center">Software Engineer</p>
+                            <p class="text-muted text-center">{{fillVerUsuario.cNombre}}</p>
                         </div>
                     <!-- /.card-body -->
                     </div>
@@ -153,6 +153,17 @@ export default {
                 oFotografia: '',
                 profile_image: ''
             },
+            fillVerUsuario:{
+                nIdUsuario: this.$attrs.id,
+                cPrimerNombre: '',
+                cSegundoNombre: '',
+                cApellido: '',
+                cUsuario: '',
+                cCorreo: '',
+                cContrasena: '',
+                oFotografia: '',
+                cNombreRol: ''
+            },
             form: new FormData,
             fullscreenLoading: false,
             modalShow: false,
@@ -186,7 +197,7 @@ export default {
                 params: params
             })
             .then( res => {
-                console.log(res.data[0])
+                // console.log(res.data[0])
                 let usuario = res.data[0]
                 this.fillEditarUsuario.cPrimerNombre = usuario.firstname,
                 this.fillEditarUsuario.cSegundoNombre = usuario.secondname,
@@ -205,10 +216,23 @@ export default {
         getFile(e){
             this.fillEditarUsuario.oFotografia =  e.target.files[0]
         },
+        getRolByUsuario(){
+                let url = '/administracion/usuario/getRolByUsuario'
+                let params = {
+                    'nIdUsuario': this.fillVerUsuario.nIdUsuario
+                }
+                axios.get(url, {
+                    params: params
+                })
+                .then( res => {
+                    // console.log(res.data)
+                    this.fillVerUsuario.cNombre = (res.data.length == 0) ? '' : res.data[0].name
+                })
+        },
         setRegistrarUsuario(){
             if(this.validarResgistrarUsuario()){
                 this.modalShow = true
-                console.log(this.mensajeError)
+                // console.log(this.mensajeError)
                 return
             }
             if(!this.fillEditarUsuario.oFotografia || this.fillEditarUsuario == undefined){
@@ -220,8 +244,8 @@ export default {
         },
         setGuardarUsuario(nIdFile){
             let url = '/administracion/usuario/setEditarUsuario'
-            console.log('setGuardarUsuario')
-            console.log('File: '+nIdFile)
+            // console.log('setGuardarUsuario')
+            // console.log('File: '+nIdFile)
             this.fullscreenLoading = true
             axios.post(url, {
                 'nIdUsuario': this.fillEditarUsuario.nIdUsuario,
@@ -234,8 +258,9 @@ export default {
                 'oFotografia': nIdFile
                 })
                 .then(res=>{
-                    console.log(res)
-                    console.log("Actualizado Exitosamente")
+                    this.getRefrescarUsuarioAuth()
+                    // console.log(res)
+                    // console.log("Actualizado Exitosamente")
                     this.fullscreenLoading = false
                     Swal.fire({
                         icon: 'success',
@@ -247,11 +272,26 @@ export default {
                 })
 
         },
+        getRefrescarUsuarioAuth(){
+            var url = '/administracion/usuario/getRefrescarUsuarioAuth'
+            axios.get(url)
+            .then(res=>{
+                // console.log(res)
+                EventBus.$emit('verifyAuthenticatedUser', res.data)
+                this.fullscreenLoading = false
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Actualizado Exitosamente',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+            })
+        },
         setRegistrarArchivo(){
             this.form.append('file', this.fillEditarUsuario.oFotografia)
             const config = { headers: {'Content-Type': 'Multipart/from-data'}}
             var url = '/archivo/setRegistrarArchivo'
-            console.log('setRegistrarArchivo')
+            // console.log('setRegistrarArchivo')
             axios.post(url, this.form, config)
                 .then(res=>{
                     console.log(res)

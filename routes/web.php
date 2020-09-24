@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,7 +14,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::post('/authenticate/login', 'Auth\LoginController@login');
+Route::post('/authenticate/logout', 'Auth\LoginController@logout');
+
 Route::get('/administracion/usuario/getListaUsuarios', 'Administracion\UsersController@getListaUsuarios');
+Route::get('/administracion/usuario/getRefrescarUsuarioAuth', function(){
+    return Auth::user()->load('file');
+});
 Route::post('/administracion/usuario/setRegistrarUsuario', 'Administracion\UsersController@setRegistrarUsuario');
 Route::post('/administracion/usuario/setEditarUsuario', 'Administracion\UsersController@setEditarUsuario');
 Route::post('/administracion/usuario/setCambiarEstadoUsuario', 'Administracion\UsersController@setCambiarEstadoUsuario');
@@ -39,3 +46,7 @@ Route::get('/{opcional?}', function () {
     return view('app');
 })->name('basepath')
     ->where('opcional', '.*');
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');

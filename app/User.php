@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\File;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -36,4 +37,16 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    protected $appends = ['fullname'];
+
+    public function getFullNameAttribute()
+    {
+        return "{$this->firstname} {$this->lasname}";
+    }
+
+    public function file()
+    {
+        return $this->belongsTo(File::class, 'file_id');
+    }
 }
