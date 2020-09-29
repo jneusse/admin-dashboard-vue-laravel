@@ -1,7 +1,7 @@
 <template>
     <div>
         <!--Nav Bar-->
-        <Navbar :ruta="ruta"/>
+        <Navbar :ruta="ruta" :usuario="authUser" :listPermisos="listRolPermisosByUsuario"/>
         <!--Sidebar-->
         <Sidebar :ruta="ruta" :usuario="authUser" :listPermisos="listRolPermisosByUsuario"/>
         <!--Content-->

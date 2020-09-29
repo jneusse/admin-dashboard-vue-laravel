@@ -3,27 +3,38 @@
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
                 <!-- Left navbar links -->
                 <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-                </li>
-                <li class="nav-item d-none d-sm-inline-block">
-                    <a href="../../index3.html" class="nav-link">Home</a>
-                </li>
-                <li class="nav-item d-none d-sm-inline-block">
-                    <a href="#" class="nav-link">Contact</a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                    </li>
+                    <!-- <template v-if="listPermisos.includes('dashboard.index')"> -->
+                        <li class="nav-item d-none d-sm-inline-block">
+                            <router-link :to="'/'" href="/" class="nav-link">Inicio</router-link>
+                        </li>
+                    <!-- </template> -->
+                    <!-- <template v-if="listPermisos.includes('pedido.index')"> -->
+                        <li class="nav-item d-none d-sm-inline-block">
+                            <router-link class="nav-link" :to="{name: 'pedido.index'}" href="/pedido">Pedido</router-link>
+                        </li>
+                    <!-- </template> -->
                 </ul>
 
                 <!-- SEARCH FORM -->
                 <form class="form-inline ml-3">
-                <div class="input-group input-group-sm">
-                    <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
-                    <div class="input-group-append">
-                    <button class="btn btn-navbar" type="submit">
-                        <i class="fas fa-search"></i>
-                    </button>
+                    <div class="input-group input-group-sm">
+                        <el-autocomplete
+                            class="inline-input"
+                            v-model="state2"
+                            :fetch-suggestions="querySearch"
+                            placeholder="Please Input"
+                            :trigger-on-focus="true"
+                            size="small"
+                            @select="handleSelect">
+                            <i
+                                class="el-icon-search el-input__icon"
+                                slot="suffix">
+                            </i>
+                        </el-autocomplete>
                     </div>
-                </div>
                 </form>
 
                 <!-- Right navbar links -->
@@ -126,7 +137,62 @@
 
 <script>
 export default {
-    props: ['ruta']
+    props: ['ruta', 'usuario', 'listPermisos'],
+    data(){
+        return{
+            state2: '',
+            links: [],
+            listRolPermisosByUsuario: [],
+            listRolPermisosByUsuarioFilter: []
+        }
+    },
+    methods:{
+        querySearch(queryString, cb) {
+            var links = this.listRolPermisosByUsuarioFilter;
+            var results = queryString ? links.filter(this.createFilter(queryString)) : links;
+            // call callback function to return suggestions
+            cb(results);
+        },
+        createFilter(queryString) {
+            return (link) => {
+                return (link.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+            };
+        },
+        handleSelect(item) {
+            if(this.$route.name != item.link){
+                this.$router.push({name: item.link})
+                this.state2 = ''
+            }else{
+                this.state2 = ''
+            }
+        },
+        getListarRolPermisosbyUsuario(){
+                let url = '/administracion/usuario/getListarRolPermisosbyUsuario'
+                axios.get(url,{params:{
+                    'nIdUsuario': this.usuario.id
+                    }
+                }).then(res=>{
+                    this.listRolPermisosByUsuario = res.data
+                    this.filtarListarRolPermisosbyUsuario()
+                })
+        },
+        filtarListarRolPermisosbyUsuario(){
+            let me = this
+            me.listRolPermisosByUsuarioFilter = []
+            me.listRolPermisosByUsuario.map(function(x,y){
+                if(x.slug.includes('index')){
+                    me.listRolPermisosByUsuarioFilter.push({
+                        'value' : x.name,
+                        'link'  : x.slug
+                    })
+                    // console.log(x.name)
+                }
+            })
+        },
+    },
+    mounted() {
+      this.getListarRolPermisosbyUsuario();
+    }
 
 }
 </script>

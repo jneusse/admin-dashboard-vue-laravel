@@ -51,7 +51,7 @@
                         </template>
                     </li>
                     <!-- OPERACIONES -->
-                    <template v-if="listPermisos.includes('pedido.index', 'cliente.inde')">
+                    <template v-if="listPermisos.includes('pedido.index', 'cliente.index')">
                         <li class="nav-header">OPERACIONES</li>
                         <li class="nav-item">
                             <template v-if="listPermisos.includes('pedido.index')">
@@ -127,7 +127,7 @@
                         <li class="nav-header">REPORTES</li>
                         <li class="nav-item">
                             <template v-if="listPermisos.includes('reporte.pedido.index')">
-                                <router-link :to="'/pedido'" href="/pedido" class="nav-link">
+                                <router-link :to="'/reporte'" href="/pedido" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Pedidos</p>
                                 </router-link>

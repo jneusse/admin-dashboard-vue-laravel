@@ -47,10 +47,12 @@ Route::group(['middleware' => ['auth', 'only.ajax']], function () {
     Route::get('/configuracion/categoria/getListaCategorias', 'Configuracion\CategoriesController@getListaCategorias');
     Route::post('/configuracion/categoria/setRegistrarCategoria', 'Configuracion\CategoriesController@setRegistrarCategoria');
     Route::post('/configuracion/categoria/setEditarCategoria', 'Configuracion\CategoriesController@setEditarCategoria');
-// Configuracion Prodcutos
+// Configuracion Productos
     Route::get('/configuracion/producto/getListaProductos', 'Configuracion\ProductsController@getListaProductos');
     Route::post('/configuracion/producto/setRegistrarProducto', 'Configuracion\ProductsController@setRegistrarProducto');
     Route::post('/configuracion/producto/setEditarProducto', 'Configuracion\ProductsController@setEditarProducto');
+// Configuracion Operacion
+    Route::get('/operacion/pedidos/getListaPedidos', 'Operacion\OrdersController@getListaPedidos');
 
     Route::post('/archivo/setRegistrarArchivo', 'FilesController@setRegistrarArchivo');
 });
