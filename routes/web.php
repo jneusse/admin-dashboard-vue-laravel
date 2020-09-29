@@ -50,6 +50,7 @@ Route::group(['middleware' => ['auth', 'only.ajax']], function () {
 // Configuracion Prodcutos
     Route::get('/configuracion/producto/getListaProductos', 'Configuracion\ProductsController@getListaProductos');
     Route::post('/configuracion/producto/setRegistrarProducto', 'Configuracion\ProductsController@setRegistrarProducto');
+    Route::post('/configuracion/producto/setEditarProducto', 'Configuracion\ProductsController@setEditarProducto');
 
     Route::post('/archivo/setRegistrarArchivo', 'FilesController@setRegistrarArchivo');
 });

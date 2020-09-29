@@ -98,8 +98,8 @@
                                     <td v-text="item.stock"></td>
                                     <td v-text="item.precio"></td>
                                     <td>
-                                        <template v-if="listRolPermisosByUsuario.includes('categoria.editar')">
-                                            <router-link :to="{name:'categoria.editar', params: {id: item.id}}" class="btn btn-flat btn-info btn-sm">
+                                        <template v-if="listRolPermisosByUsuario.includes('producto.editar')">
+                                            <router-link :to="{name:'producto.editar', params: {id: item.id}}" class="btn btn-flat btn-info btn-sm">
                                                 <i class="fas fa-pencil-alt"></i> Editar
                                             </router-link>
                                         </template>
