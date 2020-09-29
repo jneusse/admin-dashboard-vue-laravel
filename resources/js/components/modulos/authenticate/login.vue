@@ -74,6 +74,8 @@ export default {
                 cEmail: '',
                 cContrasena: ''
             },
+            listRolPermisosByUsuario: [],
+            listRolPermisosByUsuarioFilter: [],
             fullscreenLoading: false,
             error: 0,
             mensajeError: []
@@ -94,9 +96,31 @@ export default {
                     this.loginFailed()
                 }
                 if(res.data.code == 200){
-                    this.loginSucess()
+                    // this.loginSucess()
+                    this.getListarRolPermisosbyUsuario(res.data.authUser)
                 }
             })
+        },
+        getListarRolPermisosbyUsuario(authUser){
+            let url = '/administracion/usuario/getListarRolPermisosbyUsuario'
+            axios.get(url,{params:{
+                'nIdUsuario': authUser.id
+                }
+            }).then(res=>{
+                this.listRolPermisosByUsuario = res.data
+                console.log(this.listRolPermisosByUsuario)
+                this.filtarListarRolPermisosbyUsuario(authUser)
+            })
+        },
+        filtarListarRolPermisosbyUsuario(authUser){
+            let me = this
+            me.listRolPermisosByUsuario.map(function(x,y){
+                me.listRolPermisosByUsuarioFilter.push(x.slug)
+                console.log(x.slug)
+            })
+            sessionStorage.setItem('listRolPermisosByUsuario', JSON.stringify(me.listRolPermisosByUsuarioFilter))
+            sessionStorage.setItem('authUser', JSON.stringify(authUser))
+            this.loginSucess()
         },
         loginSucess(){
             this.$router.push({name: 'dashboard.index'})

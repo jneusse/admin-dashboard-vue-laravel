@@ -12,9 +12,11 @@
             <div class="card">
                 <div class="card-header">
                     <div class="card-tools">
-                        <router-link class="btn btn-info btn-sm" :to="'/rol/crear'">
-                            <i class="fas fa-plus-square"></i> Nuevo Rol
-                        </router-link>
+                        <template v-if="listRolPermisosByUsuario.includes('rol.crear')">
+                            <router-link class="btn btn-info btn-sm" :to="{name: 'rol.crear'}">
+                                <i class="fas fa-plus-square"></i> Nuevo Rol
+                            </router-link>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -75,12 +77,16 @@
                                     <td v-text="item.name"></td>
                                     <td v-text="item.slug"></td>
                                     <td>
-                                        <button class="btn btn-flat btn-primary btn-sm" @click.prevent="abrirModalByOption('rol', 'ver', item)">
-                                            <i class="fas fa-folder"></i> Ver
-                                        </button>
-                                        <router-link :to="{name:'rol.editar', params: {id: item.id}}" class="btn btn-flat btn-info btn-sm">
-                                            <i class="fas fa-pencil-alt"></i> Editar
-                                        </router-link>
+                                        <template v-if="listRolPermisosByUsuario.includes('rol.ver')">
+                                            <button class="btn btn-flat btn-primary btn-sm" @click.prevent="abrirModalByOption('rol', 'ver', item)">
+                                                <i class="fas fa-folder"></i> Ver
+                                            </button>
+                                        </template>
+                                        <template v-if="listRolPermisosByUsuario.includes('rol.editar')">
+                                            <router-link :to="{name:'rol.editar', params: {id: item.id}}" class="btn btn-flat btn-info btn-sm">
+                                                <i class="fas fa-pencil-alt"></i> Editar
+                                            </router-link>
+                                        </template>
                                     </td>
                                 </tr>
                             </tbody>
@@ -206,6 +212,7 @@ export default {
                 cNombre: '',
                 cSlug: ''
             },
+            listRolPermisosByUsuario: JSON.parse(sessionStorage.getItem('listRolPermisosByUsuario')),
             listPermisos: [],
             listRoles:[],
             pageNumber: 0,
@@ -266,14 +273,23 @@ export default {
             }
             this.fullscreenLoading = true
             axios.get(url, {
-                params: params
-            })
-            .then( res => {
-                //console.log(res.data)
-                this.pageNumber = 0
-                this.listRoles = res.data
-                this.fullscreenLoading = false
-            })
+                    params: params
+                })
+                .then( res => {
+                    //console.log(res.data)
+                    this.pageNumber = 0
+                    this.listRoles = res.data
+                    this.fullscreenLoading = false
+                })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        location.reload()
+                        sessionStorage.clear()
+                        this.fullscreenLoading = false
+                    }
+                })
         },
         nextPage(){
             this.pageNumber++
@@ -296,7 +312,16 @@ export default {
                     // console.log(this.listPermisos[0].name)
                     this.modalShow = true
                     this.modalOption = 2
-            })
+                })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        location.reload()
+                        sessionStorage.clear()
+                        this.fullscreenLoading = false
+                    }
+                })
         },
         abrirModal(){
             this.modalShow = !this.modalShow

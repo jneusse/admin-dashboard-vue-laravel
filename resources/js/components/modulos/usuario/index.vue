@@ -12,9 +12,11 @@
             <div class="card">
                 <div class="card-header">
                     <div class="card-tools">
-                        <router-link class="btn btn-info btn-sm" :to="'/usuario/crear'">
-                            <i class="fas fa-plus-square"></i> Nuevo Usuario
-                        </router-link>
+                        <template v-if="listRolPermisosByUsuario.includes('usuario.crear')">
+                            <router-link class="btn btn-info btn-sm" :to="{name: 'usuario.crear'}">
+                                <i class="fas fa-plus-square"></i> Nuevo Usuario
+                            </router-link>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -110,9 +112,9 @@
                                             </li>
                                         </template>
                                     </td>
-                                    <td v-text="item.fullname">Juan</td>
-                                    <td v-text="item.email">correo@email.com</td>
-                                    <td v-text="item.username">juan123</td>
+                                    <td v-text="item.fullname"></td>
+                                    <td v-text="item.email"></td>
+                                    <td v-text="item.username"></td>
                                     <td>
                                         <template v-if="item.state == 'A'">
                                             <span class="badge badge-success">Activo</span>
@@ -122,24 +124,34 @@
                                         </template>
                                     </td>
                                     <td>
-                                        <router-link :to="{name:'usuario.ver', params: {id: item.id}}" class="btn btn-flat btn-primary btn-sm">
-                                            <i class="fas fa-folder"></i> Ver
-                                        </router-link>
+                                        <template v-if="listRolPermisosByUsuario.includes('usuario.ver')">
+                                            <router-link :to="{name:'usuario.ver', params: {id: item.id}}" class="btn btn-flat btn-primary btn-sm">
+                                                <i class="fas fa-folder"></i> Ver
+                                            </router-link>
+                                        </template>
                                         <template v-if="item.state == 'A'">
-                                            <router-link :to="{name:'usuario.editar', params: {id: item.id}}" class="btn btn-flat btn-info btn-sm">
-                                                <i class="fas fa-pencil-alt"></i> Editar
-                                            </router-link>
-                                            <router-link :to="{name:'usuario.permiso', params: {id: item.id}}" class="btn btn-flat btn-success btn-sm">
-                                                <i class="fas fa-key"></i> Permiso
-                                            </router-link>
-                                            <button class="btn btn-flat btn-danger btn-sm" @click.prevent="setCambiarEstado(1, item.id)">
-                                                <i class="fas fa-trash"></i> Desactivar
-                                            </button>
+                                            <template v-if="listRolPermisosByUsuario.includes('usuario.editar')">
+                                                <router-link :to="{name:'usuario.editar', params: {id: item.id}}" class="btn btn-flat btn-info btn-sm">
+                                                    <i class="fas fa-pencil-alt"></i> Editar
+                                                </router-link>
+                                            </template>
+                                            <template v-if="listRolPermisosByUsuario.includes('usuario.permiso')">
+                                                <router-link :to="{name:'usuario.permiso', params: {id: item.id}}" class="btn btn-flat btn-success btn-sm">
+                                                    <i class="fas fa-key"></i> Permiso
+                                                </router-link>
+                                            </template>
+                                            <template v-if="listRolPermisosByUsuario.includes('usuario.desactivar')">
+                                                <button class="btn btn-flat btn-danger btn-sm" @click.prevent="setCambiarEstado(1, item.id)">
+                                                    <i class="fas fa-trash"></i> Desactivar
+                                                </button>
+                                            </template>
                                         </template>
                                         <template v-else>
-                                            <button class="btn btn-flat btn-success btn-sm" @click.prevent="setCambiarEstado(2, item.id)">
-                                                <i class="fas fa-check"></i> Activar
-                                            </button>
+                                            <template v-if="listRolPermisosByUsuario.includes('usuario.activar')">
+                                                <button class="btn btn-flat btn-success btn-sm" @click.prevent="setCambiarEstado(2, item.id)">
+                                                    <i class="fas fa-check"></i> Activar
+                                                </button>
+                                            </template>
                                         </template>
                                     </td>
                                 </tr>
@@ -186,6 +198,7 @@ export default {
                 cCorreo: '',
                 cEstado: ''
             },
+            listRolPermisosByUsuario: JSON.parse(sessionStorage.getItem('listRolPermisosByUsuario')),
             listUsuarios:[],
             listEstado:[
                 {value:'A', label: 'Activo'},
@@ -221,6 +234,9 @@ export default {
             return pagesArray
         }
     },
+    mounted(){
+        this.getListaUsuarios()
+    },
     methods:{
         limpiarCriteriosBsq(){
 
@@ -245,10 +261,19 @@ export default {
                 params: params
             })
             .then( res => {
-                // console.log(res)
+                // console.log(JSON.parse(sessionStorage.getItem('listRolPermisosByUsuario')))
                 this.pageNumber = 0
                 this.listUsuarios = res.data
                 this.fullscreenLoading = false
+            })
+            .catch(error=>{
+                console.log(error.response)
+                if(error.response.status == 401){
+                    this.$router.push({name: 'login'})
+                    location.reload()
+                    sessionStorage.clear()
+                    this.fullscreenLoading = false
+                }
             })
         },
         nextPage(){
@@ -262,31 +287,40 @@ export default {
         },
         setCambiarEstado(op, id){
             Swal.fire({
-                title: '¿Estás seguro de '+((op == 1) ? 'desactivar' : 'activar' )+ 'el usuario?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: ((op == 1) ? 'Si, desactivar' : 'Si, activar')
+                    title: '¿Estás seguro de '+((op == 1) ? 'desactivar' : 'activar' )+ 'el usuario?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: ((op == 1) ? 'Si, desactivar' : 'Si, activar')
                 }).then((result) => {
-                if (result.isConfirmed) {
-                    !this.fullscreenLoading
-                    let url = '/administracion/usuario/setCambiarEstadoUsuario'
-                    axios.post(url, {
-                        'nIdUsuario': id,
-                        'cEstado': (op == 1) ? 'I' : 'A'
-                    })
-                    .then(res=>{
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Se '+((op == 1) ? 'desactivó' : 'activó')+' el usuario exitosamente',
-                            showConfirmButton: false,
-                            timer: 1500
+                    if (result.isConfirmed) {
+                        !this.fullscreenLoading
+                        let url = '/administracion/usuario/setCambiarEstadoUsuario'
+                        axios.post(url, {
+                            'nIdUsuario': id,
+                            'cEstado': (op == 1) ? 'I' : 'A'
                         })
-                        this.getListaUsuarios()
-                    })
-                }
-            })
+                        .then(res=>{
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Se '+((op == 1) ? 'desactivó' : 'activó')+' el usuario exitosamente',
+                                showConfirmButton: false,
+                                timer: 1500
+                            })
+                            this.getListaUsuarios()
+                        })
+                        .catch(error=>{
+                            console.log(error.response)
+                            if(error.response.status == 401){
+                                this.$router.push({name: 'login'})
+                                location.reload()
+                                sessionStorage.clear()
+                                this.fullscreenLoading = false
+                            }
+                        })
+                    }
+                })
         }
 
     }

@@ -9,6 +9,10 @@ use Exception;
 
 class PermissionsController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     public function getListarPermisos(Request $request)
     {
         if (!$request->ajax()) return redirect('/');

@@ -174,10 +174,19 @@ export default {
         getListaRoles(){
             let url = '/administracion/rol/getListaRoles'
             axios.get(url)
-            .then( res => {
-                //console.log(res.data)
-                this.listRoles = res.data
-            })
+                .then( res => {
+                    //console.log(res.data)
+                    this.listRoles = res.data
+                })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        location.reload()
+                        sessionStorage.clear()
+                        this.fullscreenLoading = false
+                    }
+                })
         },
         getRolByUsuario(){
             let url = '/administracion/usuario/getRolByUsuario'
@@ -185,11 +194,20 @@ export default {
                 'nIdUsuario': this.fillEditarUsuario.nIdUsuario
             }
             axios.get(url, {
-                params: params
-            })
-            .then( res => {
-                this.fillEditarUsuario.nIdRol = (res.data.length == 0) ? '' : res.data[0].nIdRol
-            })
+                    params: params
+                })
+                .then( res => {
+                    this.fillEditarUsuario.nIdRol = (res.data.length == 0) ? '' : res.data[0].nIdRol
+                })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        location.reload()
+                        sessionStorage.clear()
+                        this.fullscreenLoading = false
+                    }
+                })
         },
         getUsuarioById(){
             let url = '/administracion/usuario/getListaUsuarios'
@@ -198,20 +216,29 @@ export default {
             }
             this.fullscreenLoading = true
             axios.get(url, {
-                params: params
-            })
-            .then( res => {
-                // console.log(res.data[0])
-                let usuario = res.data[0]
-                this.fillEditarUsuario.cPrimerNombre = usuario.firstname,
-                this.fillEditarUsuario.cSegundoNombre = usuario.secondname,
-                this.fillEditarUsuario.cApellido = usuario.lastname,
-                this.fillEditarUsuario.cUsuario = usuario.username,
-                this.fillEditarUsuario.cCorreo = usuario.email,
-                setTimeout(() => {
-                    this.fullscreenLoading = false
-                }, 1000);
-            })
+                    params: params
+                })
+                .then( res => {
+                    // console.log(res.data[0])
+                    let usuario = res.data[0]
+                    this.fillEditarUsuario.cPrimerNombre = usuario.firstname,
+                    this.fillEditarUsuario.cSegundoNombre = usuario.secondname,
+                    this.fillEditarUsuario.cApellido = usuario.lastname,
+                    this.fillEditarUsuario.cUsuario = usuario.username,
+                    this.fillEditarUsuario.cCorreo = usuario.email,
+                    setTimeout(() => {
+                        this.fullscreenLoading = false
+                    }, 1000);
+                })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        location.reload()
+                        sessionStorage.clear()
+                        this.fullscreenLoading = false
+                    }
+                })
         },
         limpiarCriterios(){
             this.fillEditarUsuario.cPrimerNombre = ''
@@ -269,6 +296,15 @@ export default {
                     this.setEditarRolByUsuario()
                     //this.$router.push('/usuario')
                 })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        location.reload()
+                        sessionStorage.clear()
+                        this.fullscreenLoading = false
+                    }
+                })
 
         },
         setRegistrarArchivo(){
@@ -281,6 +317,15 @@ export default {
                     console.log(res)
                     let nIdFile = res.data[0].nIdFile;
                     this.setGuardarUsuario(nIdFile)
+                })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        location.reload()
+                        sessionStorage.clear()
+                        this.fullscreenLoading = false
+                    }
                 })
         },
         validarResgistrarUsuario(){
@@ -311,14 +356,22 @@ export default {
             let url = '/administracion/usuario/setEditarRolByUsuario'
             this.fullscreenLoading = true
             axios.post(url, {
-                'nIdUsuario': this.fillEditarUsuario.nIdUsuario,
-                'nIdRol': this.fillEditarUsuario.nIdRol
-
+                    'nIdUsuario': this.fillEditarUsuario.nIdUsuario,
+                    'nIdRol': this.fillEditarUsuario.nIdRol
                 })
                 .then(res=>{
                     console.log(res)
                     this.fullscreenLoading = false
                     // this.$router.push('/usuario')
+                })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        location.reload()
+                        sessionStorage.clear()
+                        this.fullscreenLoading = false
+                    }
                 })
 
         }

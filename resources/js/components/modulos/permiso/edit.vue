@@ -147,6 +147,15 @@ export default {
                     })
                     this.$router.push('/permiso')
                 })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        location.reload()
+                        sessionStorage.clear()
+                        this.fullscreenLoading = false
+                    }
+                })
 
         },
         getListarPermisos(){
@@ -167,6 +176,15 @@ export default {
                 this.fillEditarPermiso.cSlug = res.data[0].slug
                 // this.listRoles = res.data
                 this.fullscreenLoading = false
+            })
+            .catch(error=>{
+                console.log(error.response)
+                if(error.response.status == 401){
+                    this.$router.push({name: 'login'})
+                    location.reload()
+                    sessionStorage.clear()
+                    this.fullscreenLoading = false
+                }
             })
         },
         validarEditarPermiso(){

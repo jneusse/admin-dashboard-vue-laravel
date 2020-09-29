@@ -12,7 +12,7 @@
             <div class="card">
                 <div class="card-header">
                     <div class="card-tools">
-                        <router-link class="btn btn-info btn-sm" :to="'/usuarios'">
+                        <router-link class="btn btn-info btn-sm" :to="'/usuario'">
                             <i class="fas fa-arrow-left"></i> Regresar
                         </router-link>
                     </div>
@@ -141,15 +141,24 @@
             getListarPermisosByUsuarioAsignado(){
                 let url = '/administracion/usuario/getListarPermisosByUsuario'
                 axios.get(url, {params:
-                    {
-                        'nIdUsuario': this.fillPermiso.nIdUsuario
-                    }
-                }).then(res=>{
-                    // console.log('res.data')
-                    this.listarPermisosByRolAsignado = res.data
-                    // console.log(this.listPermisos[0].name)
-                    this.filtarPermisosByUsuario()
-                })
+                        {
+                            'nIdUsuario': this.fillPermiso.nIdUsuario
+                        }
+                    }).then(res=>{
+                        // console.log('res.data')
+                        this.listarPermisosByRolAsignado = res.data
+                        // console.log(this.listPermisos[0].name)
+                        this.filtarPermisosByUsuario()
+                    })
+                    .catch(error=>{
+                        console.log(error.response)
+                        if(error.response.status == 401){
+                            this.$router.push({name: 'login'})
+                            location.reload()
+                            sessionStorage.clear()
+                            this.fullscreenLoading = false
+                        }
+                    })
             },
             getRolByUsuario(){
                 let url = '/administracion/usuario/getRolByUsuario'
@@ -159,23 +168,41 @@
                 axios.get(url, {
                     params: params
                 })
-                .then( res => {
-                    // console.log(res.data)
-                    this.fillPermiso.cNombre = (res.data.length == 0) ? '' : res.data[0].name
-                })
+                    .then( res => {
+                        // console.log(res.data)
+                        this.fillPermiso.cNombre = (res.data.length == 0) ? '' : res.data[0].name
+                    })
+                    .catch(error=>{
+                        console.log(error.response)
+                        if(error.response.status == 401){
+                            this.$router.push({name: 'login'})
+                            location.reload()
+                            sessionStorage.clear()
+                            this.fullscreenLoading = false
+                        }
+                    })
             },
             getListarPermisosByUsuario(){
                 let url = '/administracion/usuario/getListarPermisosByUsuario'
                 axios.get(url,{params:
-                    {
-                        'nIdUsuario': this.fillPermiso.nIdUsuario
-                    }
-                }).then(res=>{
-                    // console.log(res.data)
-                    this.listPermisos = res.data
-                    // console.log(this.listPermisos[0].name)
-                    this.filtarPermisosByUsuario()
-                })
+                        {
+                            'nIdUsuario': this.fillPermiso.nIdUsuario
+                        }
+                    }).then(res=>{
+                        // console.log(res.data)
+                        this.listPermisos = res.data
+                        // console.log(this.listPermisos[0].name)
+                        this.filtarPermisosByUsuario()
+                    })
+                    .catch(error=>{
+                        console.log(error.response)
+                        if(error.response.status == 401){
+                            this.$router.push({name: 'login'})
+                            location.reload()
+                            sessionStorage.clear()
+                            this.fullscreenLoading = false
+                        }
+                    })
             },
             limpiarCriterios(){
                 this.fillCrearRol.cNombre = ''
@@ -219,6 +246,15 @@
                             showConfirmButton: false,
                             timer: 1500
                         })
+                    })
+                    .catch(error=>{
+                        console.log(error.response)
+                        if(error.response.status == 401){
+                            this.$router.push({name: 'login'})
+                            location.reload()
+                            sessionStorage.clear()
+                            this.fullscreenLoading = false
+                        }
                     })
 
             },

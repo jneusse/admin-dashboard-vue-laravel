@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -15,38 +16,51 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/authenticate/login', 'Auth\LoginController@login');
-Route::post('/authenticate/logout', 'Auth\LoginController@logout');
 
-Route::get('/administracion/usuario/getListaUsuarios', 'Administracion\UsersController@getListaUsuarios');
-Route::get('/administracion/usuario/getRefrescarUsuarioAuth', function(){
-    return Auth::user()->load('file');
+Route::group(['middleware' => ['auth', 'only.ajax']], function () {
+// Authentication
+    Route::post('/authenticate/logout', 'Auth\LoginController@logout');
+    Route::get('/administracion/usuario/getListaUsuarios', 'Administracion\UsersController@getListaUsuarios');
+    Route::get('/administracion/usuario/getRefrescarUsuarioAuth', function(){
+        return Auth::user()->load('file');
+    });
+// Administracion Usuarios
+    Route::post('/administracion/usuario/setRegistrarUsuario', 'Administracion\UsersController@setRegistrarUsuario');
+    Route::post('/administracion/usuario/setEditarUsuario', 'Administracion\UsersController@setEditarUsuario');
+    Route::post('/administracion/usuario/setCambiarEstadoUsuario', 'Administracion\UsersController@setCambiarEstadoUsuario');
+    Route::post('/administracion/usuario/setEditarRolByUsuario', 'Administracion\UsersController@setEditarRolByUsuario');
+    Route::get('/administracion/usuario/getRolByUsuario', 'Administracion\UsersController@getRolByUsuario');
+    Route::get('/administracion/usuario/getListarPermisosByRol', 'Administracion\UsersController@getListarPermisosByRol');
+    Route::get('/administracion/usuario/getListarPermisosByUsuario', 'Administracion\UsersController@getListarPermisosByUsuario');
+    Route::post('/administracion/usuario/setRegistrarPermisosByUsuario', 'Administracion\UsersController@setRegistrarPermisosByUsuario');
+    Route::get('/administracion/usuario/getListarRolPermisosbyUsuario', 'Administracion\UsersController@getListarRolPermisosbyUsuario');
+// Administracion Roles
+    Route::get('/administracion/rol/getListaRoles', 'Administracion\RolesController@getListaRoles');
+    Route::get('/administracion/rol/getListarPermisosByRol', 'Administracion\RolesController@getListarPermisosByRol');
+    Route::post('/administracion/rol/setRegistrarRolPermiso', 'Administracion\RolesController@setRegistrarRolPermiso');
+    Route::post('/administracion/rol/setEditarRolPermiso', 'Administracion\RolesController@setEditarRol');
+// Administracion Permisos
+    Route::get('/administracion/permiso/getListarPermisos', 'Administracion\PermissionsController@getListarPermisos');
+    Route::post('/administracion/permiso/setRegistrarPermiso', 'Administracion\PermissionsController@setRegistrarPermiso');
+    Route::post('/administracion/permiso/setEditarPermiso', 'Administracion\PermissionsController@setEditarPermiso');
+// Configuracion Categorias
+    Route::get('/configuracion/categoria/getListaCategorias', 'Configuracion\CategoriesController@getListaCategorias');
+    Route::post('/configuracion/categoria/setRegistrarCategoria', 'Configuracion\CategoriesController@setRegistrarCategoria');
+    Route::post('/configuracion/categoria/setEditarCategoria', 'Configuracion\CategoriesController@setEditarCategoria');
+// Configuracion Prodcutos
+    Route::get('/configuracion/producto/getListaProductos', 'Configuracion\ProductsController@getListaProductos');
+    Route::post('/configuracion/producto/setRegistrarProducto', 'Configuracion\ProductsController@setRegistrarProducto');
+
+    Route::post('/archivo/setRegistrarArchivo', 'FilesController@setRegistrarArchivo');
 });
-Route::post('/administracion/usuario/setRegistrarUsuario', 'Administracion\UsersController@setRegistrarUsuario');
-Route::post('/administracion/usuario/setEditarUsuario', 'Administracion\UsersController@setEditarUsuario');
-Route::post('/administracion/usuario/setCambiarEstadoUsuario', 'Administracion\UsersController@setCambiarEstadoUsuario');
-Route::post('/administracion/usuario/setEditarRolByUsuario', 'Administracion\UsersController@setEditarRolByUsuario');
-Route::get('/administracion/usuario/getRolByUsuario', 'Administracion\UsersController@getRolByUsuario');
-Route::get('/administracion/usuario/getListarPermisosByRol', 'Administracion\UsersController@getListarPermisosByRol');
-Route::get('/administracion/usuario/getListarPermisosByUsuario', 'Administracion\UsersController@getListarPermisosByUsuario');
-Route::post('/administracion/usuario/setRegistrarPermisosByUsuario', 'Administracion\UsersController@setRegistrarPermisosByUsuario');
-
-Route::post('/archivo/setRegistrarArchivo', 'FilesController@setRegistrarArchivo');
-
-Route::get('/administracion/rol/getListaRoles', 'Administracion\RolesController@getListaRoles');
-Route::get('/administracion/rol/getListarPermisosByRol', 'Administracion\RolesController@getListarPermisosByRol');
-Route::post('/administracion/rol/setRegistrarRolPermiso', 'Administracion\RolesController@setRegistrarRolPermiso');
-Route::post('/administracion/rol/setEditarRolPermiso', 'Administracion\RolesController@setEditarRol');
-
-Route::get('/administracion/permiso/getListarPermisos', 'Administracion\PermissionsController@getListarPermisos');
-Route::post('/administracion/permiso/setRegistrarPermiso', 'Administracion\PermissionsController@setRegistrarPermiso');
-Route::post('/administracion/permiso/setEditarPermiso', 'Administracion\PermissionsController@setEditarPermiso');
-
 
 Route::get('/{opcional?}', function () {
     return view('app');
 })->name('basepath')
     ->where('opcional', '.*');
 
-Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+
+//Auth::routes();
+
+//Route::get('/home', 'HomeController@index')->name('home');

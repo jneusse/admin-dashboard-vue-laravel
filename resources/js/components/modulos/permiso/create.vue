@@ -135,6 +135,15 @@ export default {
                     this.fullscreenLoading = false
                     this.$router.push('/permiso')
                 })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        location.reload()
+                        sessionStorage.clear()
+                        this.fullscreenLoading = false
+                    }
+                })
 
         },
         validarRegistrarPermiso(){

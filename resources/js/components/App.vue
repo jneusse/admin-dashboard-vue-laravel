@@ -3,7 +3,7 @@
         <!--Nav Bar-->
         <Navbar :ruta="ruta"/>
         <!--Sidebar-->
-        <Sidebar :ruta="ruta" :usuario="authUser"/>
+        <Sidebar :ruta="ruta" :usuario="authUser" :listPermisos="listRolPermisosByUsuario"/>
         <!--Content-->
         <div class="content-wrapper">
             <transition name="slide-fade" modo="in-out">
@@ -30,13 +30,14 @@
         components: {Navbar, Sidebar, Footer},
         data(){
             return{
-                authUser: this.usuario
+                authUser: this.usuario,
+                listRolPermisosByUsuario: []
             }
         },
         mounted(){
+            // console.log(JSON.parse(sessionStorage.getItem('listRolPermisosByUsuario')))
+            this.listRolPermisosByUsuario = JSON.parse(sessionStorage.getItem('listRolPermisosByUsuario'))
             EventBus.$on('verifyAuthenticatedUser', data => {
-                console.log(':easdf')
-                console.log(data)
                 this.authUser = data;
             })
         }

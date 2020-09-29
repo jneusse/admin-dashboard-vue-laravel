@@ -7,11 +7,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 
 
 class UsersController extends Controller
 {
-    //
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     public function getListaUsuarios(Request $request)
     {
         if (!$request->ajax()) return redirect('/');
@@ -52,8 +56,9 @@ class UsersController extends Controller
         $cCorreo = $request->cCorreo;
         $cContrasena = Hash::make($request->cContrasena);
         $oFotografia = $request->oFotografia;
+        $nidAuthUser = Auth::id();
 
-        $rpta = DB::select('call sp_Usuario_setRegistrarUsuario( ?, ?, ?, ?, ?, ?, ?)', [
+        $rpta = DB::select('call sp_Usuario_setRegistrarUsuario( ?, ?, ?, ?, ?, ?, ?, ?)', [
             $cPrimerNombre,
             $cSegundoNombre,
             $cApellido,
@@ -61,6 +66,7 @@ class UsersController extends Controller
             $cCorreo,
             $cContrasena,
             $oFotografia,
+            $nidAuthUser
         ]);
 
         return $rpta[0]->nIdUsuario;
@@ -75,13 +81,14 @@ class UsersController extends Controller
         $cApellido = $request->cApellido;
         $cUsuario = $request->cUsuario;
         $cCorreo = $request->cCorreo;
-        $cContrasena = Hash::make($request->cContrasena);
+        $cContrasena = $request->cContrasena;
         if($cContrasena != NULL){
             $cContrasena = Hash::make($cContrasena);
         }
         $oFotografia = $request->oFotografia;
+        $nidAuthUser = Auth::id();
 
-        $rpta = DB::select('call sp_Usuario_setEditarUsuario(?, ?, ?, ?, ?, ?, ?, ?)', [
+        $rpta = DB::select('call sp_Usuario_setEditarUsuario(?, ?, ?, ?, ?, ?, ?, ?, ?)', [
             $nIdUsuario,
             $cPrimerNombre,
             $cSegundoNombre,
@@ -90,6 +97,7 @@ class UsersController extends Controller
             $cCorreo,
             $cContrasena,
             $oFotografia,
+            $nidAuthUser
         ]);
 
         return $rpta;
@@ -100,14 +108,16 @@ class UsersController extends Controller
 
         $nIdUsuario = $request->nIdUsuario;
         $cEstado = $request->cEstado;
+        $nidAuthUser = Auth::id();
 
         $nIdUsuario = ($nIdUsuario == NULL) ? ($nIdUsuario = 0) : $nIdUsuario;
         $cEstado = ($cEstado == NULL) ? ($cEstado = 0) : $cEstado;
 
 
-        $rpta = DB::select('call sp_Usuario_setCambiarEstadoUsuario(?, ?)', [
+        $rpta = DB::select('call sp_Usuario_setCambiarEstadoUsuario(?, ?, ?)', [
             $nIdUsuario,
-            $cEstado
+            $cEstado,
+            $nidAuthUser
         ]);
 
         return $rpta;
@@ -211,6 +221,21 @@ class UsersController extends Controller
             return ('error');
 
         }
+
+        return $rpta;
+    }
+    public function getListarRolPermisosbyUsuario(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        $nIdUsuario = $request->nIdUsuario;
+
+        $nIdUsuario = ($nIdUsuario == NULL) ? ($nIdUsuario = 0) : $nIdUsuario;
+
+
+        $rpta = DB::select('call sp_Usuario_getListarRolPermisosbyUsuario(?)', [
+            $nIdUsuario
+        ]);
 
         return $rpta;
     }

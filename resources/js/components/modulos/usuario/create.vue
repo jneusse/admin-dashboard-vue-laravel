@@ -179,6 +179,15 @@ export default {
                 this.listRoles = res.data
                 this.fullscreenLoading = false
             })
+            .catch(error=>{
+                console.log(error.response)
+                if(error.response.status == 401){
+                    this.$router.push({name: 'login'})
+                    location.reload()
+                    sessionStorage.clear()
+                    this.fullscreenLoading = false
+                }
+            })
         },
         limpiarCriterios(){
             this.fillCrearUsuario.cPrimerNombre = ''
@@ -229,6 +238,15 @@ export default {
                     // this.$router.push('/usuario')
                     this.setEditarRolByUsuario(res.data)
                 })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        location.reload()
+                        sessionStorage.clear()
+                        this.fullscreenLoading = false
+                    }
+                })
 
         },
         setRegistrarArchivo(){
@@ -241,6 +259,15 @@ export default {
                     console.log(res)
                     let nIdFile = res.data[0].nIdFile;
                     this.setGuardarUsuario(nIdFile)
+                })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        location.reload()
+                        sessionStorage.clear()
+                        this.fullscreenLoading = false
+                    }
                 })
         },
         validarResgistrarUsuario(){
@@ -286,6 +313,15 @@ export default {
                     console.log(res)
                     this.fullscreenLoading = false
                     // this.$router.push('/usuario')
+                })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        location.reload()
+                        sessionStorage.clear()
+                        this.fullscreenLoading = false
+                    }
                 })
 
         }

@@ -143,12 +143,22 @@ export default {
     methods:{
         getListarPermisosByRol(){
             let url = '/administracion/rol/getListarPermisosByRol'
-            axios.get(url).then(res=>{
-                //console.log(res.data)
-                this.listPermisos = res.data
-                console.log(this.listPermisos[0].name)
-                this.filtarPermisosByRol()
-            })
+            axios.get(url)
+                .then(res=>{
+                    //console.log(res.data)
+                    this.listPermisos = res.data
+                    console.log(this.listPermisos[0].name)
+                    this.filtarPermisosByRol()
+                })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        location.reload()
+                        sessionStorage.clear()
+                        this.fullscreenLoading = false
+                    }
+                })
         },
         limpiarCriterios(){
             this.fillCrearRol.cNombre = ''
@@ -190,6 +200,15 @@ export default {
                     console.log("Guardado Exitosamente")
                     this.fullscreenLoading = false
                     this.$router.push('/rol')
+                })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        location.reload()
+                        sessionStorage.clear()
+                        this.fullscreenLoading = false
+                    }
                 })
 
         },

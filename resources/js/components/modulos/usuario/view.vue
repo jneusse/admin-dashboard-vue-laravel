@@ -194,21 +194,30 @@ export default {
             }
             this.fullscreenLoading = true
             axios.get(url, {
-                params: params
-            })
-            .then( res => {
-                // console.log(res.data[0])
-                let usuario = res.data[0]
-                this.fillEditarUsuario.cPrimerNombre = usuario.firstname,
-                this.fillEditarUsuario.cSegundoNombre = usuario.secondname,
-                this.fillEditarUsuario.cApellido = usuario.lastname,
-                this.fillEditarUsuario.cUsuario = usuario.username,
-                this.fillEditarUsuario.cCorreo = usuario.email,
-                this.fillEditarUsuario.profile_image = usuario.profile_image
-                setTimeout(() => {
-                    this.fullscreenLoading = false
-                }, 1000);
-            })
+                    params: params
+                })
+                .then( res => {
+                    // console.log(res.data[0])
+                    let usuario = res.data[0]
+                    this.fillEditarUsuario.cPrimerNombre = usuario.firstname,
+                    this.fillEditarUsuario.cSegundoNombre = usuario.secondname,
+                    this.fillEditarUsuario.cApellido = usuario.lastname,
+                    this.fillEditarUsuario.cUsuario = usuario.username,
+                    this.fillEditarUsuario.cCorreo = usuario.email,
+                    this.fillEditarUsuario.profile_image = usuario.profile_image
+                    setTimeout(() => {
+                        this.fullscreenLoading = false
+                    }, 1000);
+                })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        location.reload()
+                        sessionStorage.clear()
+                        this.fullscreenLoading = false
+                    }
+                })
         },
         abrirModal(){
             this.modalShow = !this.modalShow
@@ -227,6 +236,15 @@ export default {
                 .then( res => {
                     // console.log(res.data)
                     this.fillVerUsuario.cNombre = (res.data.length == 0) ? '' : res.data[0].name
+                })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        location.reload()
+                        sessionStorage.clear()
+                        this.fullscreenLoading = false
+                    }
                 })
         },
         setRegistrarUsuario(){
@@ -248,14 +266,14 @@ export default {
             // console.log('File: '+nIdFile)
             this.fullscreenLoading = true
             axios.post(url, {
-                'nIdUsuario': this.fillEditarUsuario.nIdUsuario,
-                'cPrimerNombre': this.fillEditarUsuario.cPrimerNombre,
-                'cSegundoNombre':this.fillEditarUsuario.cSegundoNombre,
-                'cApellido': this.fillEditarUsuario.cApellido,
-                'cUsuario': this.fillEditarUsuario.cUsuario,
-                'cCorreo': this.fillEditarUsuario.cCorreo,
-                'cContrasena': this.fillEditarUsuario.cContrasena,
-                'oFotografia': nIdFile
+                    'nIdUsuario': this.fillEditarUsuario.nIdUsuario,
+                    'cPrimerNombre': this.fillEditarUsuario.cPrimerNombre,
+                    'cSegundoNombre':this.fillEditarUsuario.cSegundoNombre,
+                    'cApellido': this.fillEditarUsuario.cApellido,
+                    'cUsuario': this.fillEditarUsuario.cUsuario,
+                    'cCorreo': this.fillEditarUsuario.cCorreo,
+                    'cContrasena': this.fillEditarUsuario.cContrasena,
+                    'oFotografia': nIdFile
                 })
                 .then(res=>{
                     this.getRefrescarUsuarioAuth()
@@ -270,22 +288,40 @@ export default {
                     })
                     //this.$router.push('/usuario')
                 })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        location.reload()
+                        sessionStorage.clear()
+                        this.fullscreenLoading = false
+                    }
+                })
 
         },
         getRefrescarUsuarioAuth(){
             var url = '/administracion/usuario/getRefrescarUsuarioAuth'
             axios.get(url)
-            .then(res=>{
-                // console.log(res)
-                EventBus.$emit('verifyAuthenticatedUser', res.data)
-                this.fullscreenLoading = false
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Actualizado Exitosamente',
-                        showConfirmButton: false,
-                        timer: 1500
-                    })
-            })
+                .then(res=>{
+                    // console.log(res)
+                    EventBus.$emit('verifyAuthenticatedUser', res.data)
+                    this.fullscreenLoading = false
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Actualizado Exitosamente',
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
+                })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        location.reload()
+                        sessionStorage.clear()
+                        this.fullscreenLoading = false
+                    }
+                })
         },
         setRegistrarArchivo(){
             this.form.append('file', this.fillEditarUsuario.oFotografia)
@@ -297,6 +333,15 @@ export default {
                     console.log(res)
                     let nIdFile = res.data[0].nIdFile;
                     this.setGuardarUsuario(nIdFile)
+                })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        location.reload()
+                        sessionStorage.clear()
+                        this.fullscreenLoading = false
+                    }
                 })
         },
         validarResgistrarUsuario(){

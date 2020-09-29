@@ -41,70 +41,99 @@
                     <!-- Add icons to the links using the .nav-icon class
                         with font-awesome or any other icon font library -->
                     <li class="nav-item">
-                        <router-link :to="'/'" class="nav-link active">
-                            <i class="nav-icon fas fa-tachometer-alt"></i>
-                            <p>
-                                Dashboard
-                            </p>
-                        </router-link>
+                        <template v-if="listPermisos.includes('dashboard.index')">
+                            <router-link :to="'/'" class="nav-link active">
+                                <i class="nav-icon fas fa-tachometer-alt"></i>
+                                <p>
+                                    Dashboard
+                                </p>
+                            </router-link>
+                        </template>
                     </li>
-                    <li class="nav-header">OPERACIONES</li>
-                    <li class="nav-item">
-                        <router-link :to="'/pedido'" class="nav-link">
-                            <i class="nav-icon fas fa-cash-register"></i>
-                            <p>
-                                Pedidos
-                            </p>
-                        </router-link>
-                    </li>
-                    <li class="nav-item">
-                        <router-link :to="'/cliente'" class="nav-link">
-                            <i class="nav-icon far fa-plus-square"></i>
-                            <p>
-                                Clientes
-                            </p>
-                        </router-link>
-                    </li>
-                    <li class="nav-header">CONFIGURACIÓN</li>
-                    <li class="nav-item">
-                        <router-link :to="'/categoria'" href="../examples/login.html" class="nav-link">
-                            <i class="far fa-circle nav-icon"></i>
-                            <p>Categoria</p>
-                        </router-link>
-                    </li>
-                    <li class="nav-item">
-                        <router-link :to="'/producto'" href="../examples/register.html" class="nav-link">
-                            <i class="far fa-circle nav-icon"></i>
-                            <p>Productos</p>
-                        </router-link>
-                    </li>
-                    <li class="nav-header">ADMINISTRACIÓN</li>
-                    <li class="nav-item">
-                        <router-link :to="'/usuario'" href="../examples/forgot-password.html" class="nav-link">
-                            <i class="far fa-circle nav-icon"></i>
-                            <p>Usuario</p>
-                        </router-link>
-                    </li>
-                    <li class="nav-item">
-                        <router-link :to="'/rol'" href="../examples/recover-password.html" class="nav-link">
-                            <i class="far fa-circle nav-icon"></i>
-                            <p>Roles</p>
-                        </router-link>
-                    </li>
-                    <li class="nav-header">ADMINISTRACIÓN</li>
-                    <li class="nav-item">
-                        <router-link :to="'/permiso'" href="../examples/lockscreen.html" class="nav-link">
-                            <i class="far fa-circle nav-icon"></i>
-                            <p>Permiso</p>
-                        </router-link>
-                    </li>
-                    <li class="nav-header">REPORTES</li>
-                    <li class="nav-item">
-                        <router-link :to="'/pedido'" href="../examples/legacy-user-menu.html" class="nav-link">
-                        <i class="far fa-circle nav-icon"></i>
-                        <p>Pedidos</p>
-                        </router-link>
-                    </li>
+                    <!-- OPERACIONES -->
+                    <template v-if="listPermisos.includes('pedido.index', 'cliente.inde')">
+                        <li class="nav-header">OPERACIONES</li>
+                        <li class="nav-item">
+                            <template v-if="listPermisos.includes('pedido.index')">
+                                <router-link :to="'/pedido'" class="nav-link">
+                                    <i class="nav-icon fas fa-cash-register"></i>
+                                    <p>
+                                        Pedidos
+                                    </p>
+                                </router-link>
+                            </template>
+                        </li>
+                        <li class="nav-item">
+                            <template v-if="listPermisos.includes('cliente.index')">
+                                <router-link :to="'/cliente'" class="nav-link">
+                                    <i class="nav-icon far fa-plus-square"></i>
+                                    <p>
+                                        Clientes
+                                    </p>
+                                </router-link>
+                            </template>
+                        </li>
+                    </template>
+                    <!-- CONFIGURACIÓN -->
+                    <template v-if="listPermisos.includes('categoria.index', 'producto.index')">
+                        <li class="nav-header">CONFIGURACIÓN</li>
+                        <li class="nav-item">
+                            <template v-if="listPermisos.includes('categoria.index')">
+                                <router-link :to="'/categoria'" href="/categoria" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Categoria</p>
+                                </router-link>
+                            </template>
+                        </li>
+                        <li class="nav-item">
+                            <template v-if="listPermisos.includes('producto.index')">
+                                <router-link :to="'/producto'" href="/producto" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Productos</p>
+                                </router-link>
+                            </template>
+                        </li>
+                    </template>
+                    <!-- ADMINISTRACIÓN -->
+                    <template v-if="listPermisos.includes('usuario.index', 'rol.index','permiso.index')">
+                        <li class="nav-header">ADMINISTRACIÓN</li>
+                        <li class="nav-item">
+                            <template v-if="listPermisos.includes('usuario.index')">
+                                <router-link :to="'/usuario'" href="/usuario" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Usuario</p>
+                                </router-link>
+                            </template>
+                        </li>
+                        <li class="nav-item">
+                            <template v-if="listPermisos.includes('rol.index')">
+                                <router-link :to="'/rol'" href="/rol" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Roles</p>
+                                </router-link>
+                            </template>
+                        </li>
+                        <li class="nav-item">
+                            <template v-if="listPermisos.includes('permiso.index')">
+                                <router-link :to="'/permiso'" href="/permiso" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Permiso</p>
+                                </router-link>
+                            </template>
+                        </li>
+                    </template>
+                    <!-- REPORTES -->
+                    <template v-if="listPermisos.includes('reporte.pedido.index')">
+                        <li class="nav-header">REPORTES</li>
+                        <li class="nav-item">
+                            <template v-if="listPermisos.includes('reporte.pedido.index')">
+                                <router-link :to="'/pedido'" href="/pedido" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Pedidos</p>
+                                </router-link>
+                            </template>
+                        </li>
+                    </template>
                 </ul>
             </nav>
             <!-- /.sidebar-menu -->
@@ -115,7 +144,7 @@
 
 <script>
 export default {
-    props: ['ruta', 'usuario'],
+    props: ['ruta', 'usuario', 'listPermisos'],
     data(){
         return{
             fullscreenLoading: false
@@ -130,7 +159,17 @@ export default {
                 if(res.data.code == 204 ){
                     this.$router.push({name: 'login'})
                     location.reload()
+                    sessionStorage.clear()
                     // this.fullscreenLoading = false
+                }
+            })
+            .catch(error=>{
+                console.log(error.response)
+                if(error.response.status == 401){
+                    this.$router.push({name: 'login'})
+                    location.reload()
+                    sessionStorage.clear()
+                    this.fullscreenLoading = false
                 }
             })
         }

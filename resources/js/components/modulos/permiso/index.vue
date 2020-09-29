@@ -12,9 +12,11 @@
             <div class="card">
                 <div class="card-header">
                     <div class="card-tools">
-                        <router-link class="btn btn-info btn-sm" :to="'/permiso/crear'">
-                            <i class="fas fa-plus-square"></i> Nuevo Permiso
-                        </router-link>
+                        <template v-if="listRolPermisosByUsuario.includes('permiso.crear')">
+                            <router-link class="btn btn-info btn-sm" :to="{name: 'permiso.crear'}">
+                                <i class="fas fa-plus-square"></i> Nuevo Permiso
+                            </router-link>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -75,9 +77,11 @@
                                     <td v-text="item.name"></td>
                                     <td v-text="item.slug"></td>
                                     <td>
-                                        <router-link :to="{name:'permiso.editar', params: {id: item.id}}" class="btn btn-flat btn-info btn-sm">
-                                            <i class="fas fa-pencil-alt"></i> Editar
-                                        </router-link>
+                                        <template v-if="listRolPermisosByUsuario.includes('permiso.editar')">
+                                            <router-link :to="{name:'permiso.editar', params: {id: item.id}}" class="btn btn-flat btn-info btn-sm">
+                                                <i class="fas fa-pencil-alt"></i> Editar
+                                            </router-link>
+                                        </template>
                                     </td>
                                 </tr>
                             </tbody>
@@ -120,6 +124,7 @@ export default {
                 cNombre: '',
                 cSlug: ''
             },
+            listRolPermisosByUsuario: JSON.parse(sessionStorage.getItem('listRolPermisosByUsuario')),
             listPermisos: [],
             listRoles:[],
             pageNumber: 0,
@@ -178,6 +183,15 @@ export default {
                 this.pageNumber = 0
                 this.listRoles = res.data
                 this.fullscreenLoading = false
+            })
+            .catch(error=>{
+                console.log(error.response)
+                if(error.response.status == 401){
+                    this.$router.push({name: 'login'})
+                    location.reload()
+                    sessionStorage.clear()
+                    this.fullscreenLoading = false
+                }
             })
         },
         nextPage(){
