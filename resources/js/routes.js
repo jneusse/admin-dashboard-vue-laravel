@@ -4,8 +4,32 @@ import Router from 'vue-router'
 
 Vue.use(Router)
 
+function logout(){
+    var url = '/authenticate/logout'
+    console.log('logout')
+    axios.post(url)
+        .then(res=>{
+            console.log(res.data);
+            if(res.data.code == 204 ){
+                alert('Su session ha caducado')
+                sessionStorage.clear()
+                location.reload()
+            }
+        })
+        .catch(error=>{
+            console.log(error.response)
+            if(error.response.status == 401){
+                $router.push({name: 'login'})
+                location.reload()
+                sessionStorage.clear()
+            }
+    })
+}
 function verificarAcceso(to, from, next){
     let authUser = JSON.parse(sessionStorage.getItem('authUser'))
+    setTimeout(() => {
+        logout()
+    }, 14*60*1000+30);
     if (authUser) {
         let listRolPermisosByUsuario = JSON.parse(sessionStorage.getItem('listRolPermisosByUsuario'))
         if(listRolPermisosByUsuario.includes(to.name)){
@@ -88,6 +112,14 @@ export const rutas = [
         path: '/pedido',
         name: 'pedido.index',
         component: require('./components/modulos/pedido/index.vue').default,
+        beforeEnter: (to, from, next) => {
+            verificarAcceso(to, from, next)
+        }
+    },
+    {
+        path: '/pedido/crear',
+        name: 'pedido.crear',
+        component: require('./components/modulos/pedido/create.vue').default,
         beforeEnter: (to, from, next) => {
             verificarAcceso(to, from, next)
         }

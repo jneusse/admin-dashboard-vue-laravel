@@ -51,8 +51,11 @@ Route::group(['middleware' => ['auth', 'only.ajax']], function () {
     Route::get('/configuracion/producto/getListaProductos', 'Configuracion\ProductsController@getListaProductos');
     Route::post('/configuracion/producto/setRegistrarProducto', 'Configuracion\ProductsController@setRegistrarProducto');
     Route::post('/configuracion/producto/setEditarProducto', 'Configuracion\ProductsController@setEditarProducto');
-// Configuracion Operacion
+// Operacion Pedidos
     Route::get('/operacion/pedidos/getListaPedidos', 'Operacion\OrdersController@getListaPedidos');
+// Operacion Clientes
+    Route::get('/operacion/cliente/getListarClientes', 'Operacion\CustomersController@getListarClientes');
+    Route::post('/operacion/cliente/setRegistrarCliente', 'Operacion\CustomersController@setRegistrarCliente');
 
     Route::post('/archivo/setRegistrarArchivo', 'FilesController@setRegistrarArchivo');
 });

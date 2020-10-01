@@ -155,7 +155,7 @@ export default {
         },
         createFilter(queryString) {
             return (link) => {
-                return (link.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+                return (link.value.toLowerCase().indexOf(queryString.toLowerCase()) != -1);
             };
         },
         handleSelect(item) {
@@ -174,6 +174,15 @@ export default {
                 }).then(res=>{
                     this.listRolPermisosByUsuario = res.data
                     this.filtarListarRolPermisosbyUsuario()
+                })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        location.reload()
+                        sessionStorage.clear()
+                        this.fullscreenLoading = false
+                    }
                 })
         },
         filtarListarRolPermisosbyUsuario(){
