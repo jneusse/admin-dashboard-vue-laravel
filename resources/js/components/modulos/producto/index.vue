@@ -50,7 +50,7 @@
                                     <div class="form-group row">
                                         <label for="" class="col-md-3 col-form-label">Categoria</label>
                                         <div class="col-md-9">
-                                              <el-select v-model="fillBsqProducto.nIdCategoria" placeholder="Select" clearable>
+                                            <el-select v-model="fillBsqProducto.nIdCategoria" placeholder="Select" clearable>
                                                 <el-option
                                                 v-for="item in listCategorias"
                                                 :key="item.value"

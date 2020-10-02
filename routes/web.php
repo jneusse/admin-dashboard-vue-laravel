@@ -53,6 +53,7 @@ Route::group(['middleware' => ['auth', 'only.ajax']], function () {
     Route::post('/configuracion/producto/setEditarProducto', 'Configuracion\ProductsController@setEditarProducto');
 // Operacion Pedidos
     Route::get('/operacion/pedidos/getListaPedidos', 'Operacion\OrdersController@getListaPedidos');
+    Route::post('/operacion/pedido/setRegistrarPedido', 'Operacion\OrdersController@setRegistrarPedido');
 // Operacion Clientes
     Route::get('/operacion/cliente/getListarClientes', 'Operacion\CustomersController@getListarClientes');
     Route::post('/operacion/cliente/setRegistrarCliente', 'Operacion\CustomersController@setRegistrarCliente');

@@ -109,9 +109,8 @@
                             </div>
                             <div class="card-footer">
                                 <div class="row">
-                                    <div class="col-md-12">
-                                        <button class="btn btn-flat btn-info btnWidth" v-loading.fullscreen.lock="fullscreenLoading" @click.prevent="setRegistrarPedido">Registrar</button>
-                                        <button class="btn btn-flat btn-default btnWidth" @click.prevent="limpiarCriterios">Limpiar</button>
+                                    <div v-if="fTotalPedido > 0 && listPedidos.length > 0" class="col-md-12">
+                                        <button class="btn btn-flat btn-info btnFullWidth" v-loading.fullscreen.lock="fullscreenLoading" @click.prevent="setRegistrarPedido">Registrar</button>
                                     </div>
                                 </div>
                             </div>
@@ -120,27 +119,80 @@
                     <div class="col-md-8">
                         <div class="card card-info">
                             <div class="card-header">
-                                <h3 class="card-title">Listar Permiso</h3>
+                                <h3 class="card-title">Selecionar productos</h3>
                             </div>
                             <div class="card-body">
-                                <div class="scrollTable">
-                                    <table class="table table-hover table-head-fixed text-nowrap projects">
-                                        <thead>
-                                            <th>Acción</th>
-                                            <th>Nombre</th>
-                                            <th>Url Amigable</th>
-                                        </thead>
-                                        <tbody>
-                                            <tr v-for="(item, index) in listPermisosFilter" :key="index" @click.prevent="marcarFila(index)">
-                                                <td>
-                                                    <el-checkbox v-model="item.checked"/>
-                                                </td>
-                                                <td v-text="item.name"></td>
-                                                <td v-text="item.slug"></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                                    <vs-tooltip not-arrow right>
+                                        <vs-button
+                                            square
+                                            icon
+                                            color="rgb(59,222,200)"
+                                            gradient
+                                            @click.prevent="agregarProducto">
+                                            <i class="fas fa-plus-square"></i>
+                                        </vs-button>
+                                        <template #tooltip>
+                                            Agregar producto
+                                        </template>
+                                    </vs-tooltip>
+                                <template v-if="listPedidos.length">
+                                    <div class="scrollTable">
+                                        <table class="table table-hover table-head-fixed text-nowrap projects">
+                                            <thead>
+                                                <th>Artículo</th>
+                                                <th>Stock</th>
+                                                <th>Precio</th>
+                                                <th>Subtotal</th>
+                                                <th>Acciónes</th>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="(item, index) in listPedidos" :key="index">
+                                                    <td>
+                                                        <el-select  v-model="item.nIdProducto"
+                                                                    placeholder="Seleccione un producto"
+                                                                    clearable
+                                                                    filterable
+                                                                    @change="obtenerProducto(item.nIdProducto, index)">
+                                                            <el-option
+                                                            v-for="item in listProductos"
+                                                            :key="item.id"
+                                                            :label="item.name"
+                                                            :value="item.id">
+                                                            </el-option>
+                                                        </el-select>
+                                                    </td>
+                                                    <td>
+                                                        <el-input-number v-model="item.nStock" controls-position="right"
+                                                            :min="1"
+                                                            :max="(item.nStock) ? item.nStockFlag : 1"></el-input-number>
+                                                    </td>
+                                                    <td v-text="item.fPrecio"></td>
+                                                    <td>{{ item.fSubtotal = item.fPrecio * item.nStock}}</td>
+                                                    <td>
+                                                        <el-tooltip class="item" effect="dark" content="Eliminar" placement="left">
+                                                            <vs-button
+                                                                square
+                                                                icon
+                                                                danger
+                                                                gradient
+                                                                @click.prevent="removerProducto(index)">
+                                                                <i class="fas fa-trash"></i>
+                                                            </vs-button>
+                                                        </el-tooltip>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <el-row :gutter="20">
+                                        <el-col :span="16">
+                                            <vs-input shadow v-model="cComentario" placeholder="Comentario" />
+                                            </el-col>
+                                        <el-col :span="8">
+                                            <strong>Total:</strong> {{fTotalPedido = totalPedido}}
+                                        </el-col>
+                                    </el-row>
+                                </template>
                             </div>
                         </div>
                     </div>
@@ -182,8 +234,12 @@ export default {
                 cEmail: '',
                 cTelefono: ''
             },
+            fTotalPedido: 0,
+            cComentario: '',
             listPermisosFilter: [],
             listPermisos:[],
+            listPedidos:[],
+            listProductos:[],
             form: new FormData,
             fullscreenLoading: false,
             modalShow: false,
@@ -202,12 +258,18 @@ export default {
     computed:{
     },
     mounted(){
-        this.getListarPermisosByRol()
+        this.agregarProducto()
         this.getListarClientes()
+        this.getListarProductos()
     },
     computed:{
         validEmail() {
           return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.fillCrearCliente.cEmail)
+        },
+        totalPedido(){
+            return this.listPedidos.reduce(function(valorAnterior, valorActual) {
+                return valorAnterior + parseFloat(valorActual.fSubtotal);
+            },0)
         }
     },
     methods:{
@@ -226,13 +288,63 @@ export default {
             let rpta = this.listClientes.filter(cliente => {
                 return ((String(cliente.id)).indexOf(String(item.link)) != -1)
             })
-            console.log(rpta);
             this.fillCrearCliente.nIdCliente = rpta[0].id
             this.fillCrearCliente.cDocumento = rpta[0].document
             this.fillCrearCliente.cNombre = rpta[0].name
             this.fillCrearCliente.cApellido = rpta[0].lastname
             this.fillCrearCliente.cEmail = rpta[0].email
             this.fillCrearCliente.cTelefono = rpta[0].phone
+        },
+        getListarProductos(){
+                let url = '/configuracion/producto/getListaProductos'
+                axios.get(url)
+                    .then(res=>{
+                        this.listProductos = res.data
+                        // this.filtrarClientes()
+                    })
+                    .catch(error=>{
+                        console.log(error.response)
+                        if(error.response.status == 401){
+                            this.$router.push({name: 'login'})
+                            location.reload()
+                            sessionStorage.clear()
+                            this.fullscreenLoading = false
+                        }
+                    })
+        },
+        obtenerProducto(nIdProducto, index){
+            let count = 0
+            let me = this
+                if(!nIdProducto){
+                    Vue.nextTick(function() {
+                        me.listPedidos[index].nStock = ''
+                        me.listPedidos[index].nStockFlag = ''
+                        me.listPedidos[index].fPrecio = ''
+                    })
+                }
+            this.listPedidos.map(function(x,y){
+                if(x.nIdProducto == nIdProducto && y != index ){
+                    count++
+                    const noti = me.$vs.notification({
+                        border: true,
+                        position: 'top-center',
+                        color: 'warning',
+                        title: 'Atención',
+                        text: `El producto ya se encuentra agregado`
+                    })
+                }
+            })
+            if(count == 0){
+                let rpta = this.listProductos.filter(producto => {
+                    return ((String(producto.id)).indexOf(String(nIdProducto)) != -1)
+                })
+                this.listPedidos[index].nStock = rpta[0].stock
+                this.listPedidos[index].nStockFlag = rpta[0].stock
+                this.listPedidos[index].fPrecio = rpta[0].price
+            }else{
+                this.listPedidos[index].nIdProducto = ''
+            }
+
         },
         getListarClientes(){
                 let url = '/operacion/cliente/getListarClientes'
@@ -261,24 +373,43 @@ export default {
                 })
             })
         },
-        getListarPermisosByRol(){
-            let url = '/administracion/rol/getListarPermisosByRol'
-            axios.get(url)
-                .then(res=>{
-                    //console.log(res.data)
-                    this.listPermisos = res.data
-                    console.log(this.listPermisos[0].name)
-                    this.filtarPermisosByRol()
+        agregarProducto(){
+            if(this.listPedidos.length == 0){
+                this.listPedidos.push({
+                    'nIdProducto': '',
+                    'nStock': '',
+                    'nStockFlag': '',
+                    'fPrecio': '',
+                    'fSubtotal': '',
                 })
-                .catch(error=>{
-                    console.log(error.response)
-                    if(error.response.status == 401){
-                        this.$router.push({name: 'login'})
-                        location.reload()
-                        sessionStorage.clear()
-                        this.fullscreenLoading = false
+            }else{
+                let me = this
+                let count = 0
+                this.listPedidos.map(function(x,y){
+                    if(!x.nIdProducto || !x.nStock || !x.fPrecio || !x.fSubtotal){
+                        count++
+                        const noti = me.$vs.notification({
+                            border: true,
+                            position: 'top-center',
+                            color: 'warning',
+                            title: 'Atención',
+                            text: `Debe completar la información antes de agregar un nuevo producto`
+                        })
                     }
                 })
+                if(count == 0){
+                    this.listPedidos.push({
+                        'nIdArticulo': '',
+                        'nStock': '',
+                        'nStockFlag': '',
+                        'fPrecio': '',
+                        'fSubtotal': '',
+                    })
+                }
+            }
+        },
+        removerProducto(index){
+            this.$delete(this.listPedidos, index)
         },
         limpiarCriterios(){
             this.fillCrearCliente.nIdCliente = ''
@@ -292,18 +423,6 @@ export default {
         abrirModal(){
             this.modalShow = !this.modalShow
         },
-        filtarPermisosByRol(){
-            let me = this
-            me.listPermisos.map(function(x,y){
-                me.listPermisosFilter.push({
-                    'id': x.id,
-                    'name': x.name,
-                    'slug': x.slug,
-                    'checked': false
-                })
-                //console.log(x+' - '+y)
-            })
-        },
         setRegistrarPedido(){
              if(this.validarRegistrarPedido()){
                 this.modalShow = true
@@ -312,30 +431,12 @@ export default {
             }
             if(this.switchCliente){
                 this.setRegistrarCliente()
+                console.log('setRegistrarCliente primero')
+            }else{
+                console.log('setGuardarPedido primero')
+                let nIdCliente = this.fillCrearCliente.nIdCliente
+                this.setGuardarPedido(nIdCliente)
             }
-            let url = '/operacion/pedidos/setRegistrarPedido'
-            this.fullscreenLoading = true
-            let params = {
-                    'cNombre': this.fillCrearCliente.cNombre,
-                    'cSlug': this.fillCrearCliente.cSlug,
-                    'listPermisosFilter': this.listPermisosFilter
-                }
-            // axios.post(url, params)
-            //     .then(res=>{
-            //         console.log(res)
-            //         console.log("Guardado Exitosamente")
-            //         this.fullscreenLoading = false
-            //         this.$router.push('/rol')
-            //     })
-            //     .catch(error=>{
-            //         console.log(error.response)
-            //         if(error.response.status == 401){
-            //             this.$router.push({name: 'login'})
-            //             location.reload()
-            //             sessionStorage.clear()
-            //             this.fullscreenLoading = false
-            //         }
-            //     })
 
         },
         setRegistrarCliente(){
@@ -350,9 +451,10 @@ export default {
                 }
             axios.post(url, params)
                 .then(res=>{
-                    console.log(res.data)
-                    this.getListarClientes()
                     this.fullscreenLoading = false
+                    let nIdCliente = res.data[0].nIdCliente
+                    this.getListarClientes()
+                    this.setGuardarPedido(nIdCliente)
                 })
                 .catch(error=>{
                     console.log(error.response)
@@ -364,9 +466,36 @@ export default {
                     }
                 })
         },
-        marcarFila(index){
-            console.log(this.listPermisosFilter[index])
-            this.listPermisosFilter[index].checked = !this.listPermisosFilter[index].checked
+        setGuardarPedido(nIdCliente){
+            let url = '/operacion/pedido/setRegistrarPedido'
+            this.fullscreenLoading = true
+            let params = {
+                    'nIdCliente': nIdCliente,
+                    'cComentario': this.cComentario,
+                    'fTotalPedido': this.fTotalPedido,
+                    'listPedido': this.listPedidos
+                }
+                // return console.log(params)
+            axios.post(url, params)
+                .then(res=>{
+                    this.fullscreenLoading = false
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Pedido guardado exitosamente',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+                    this.$router.push({name: 'pedido.index'})
+                })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        location.reload()
+                        sessionStorage.clear()
+                        this.fullscreenLoading = false
+                    }
+                })
         },
         validarRegistrarPedido(){
             this.error = 0
@@ -422,5 +551,37 @@ export default {
         width: 100% !important;
         border-radius: .25rem !important;
         border: 1px solid #ced4da;
+    }
+    .vs-tooltip-content{
+        width: min-content;
+    }
+    .el-row {
+        margin-bottom: 20px;
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+    .el-col {
+        border-radius: 4px;
+    }
+    .bg-purple-dark {
+        background: #99a9bf;
+    }
+    .bg-purple {
+        background: #d3dce6;
+    }
+    .bg-purple-light {
+        background: #e5e9f2;
+    }
+    .grid-content {
+        border-radius: 4px;
+        min-height: 36px;
+    }
+    .row-bg {
+        padding: 10px 0;
+        background-color: #f9fafc;
+    }
+    .btnFullWidth {
+        width: 100% !important;
     }
 </style>
