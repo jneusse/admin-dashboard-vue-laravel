@@ -439,6 +439,40 @@ export default {
             }
 
         },
+        setGenerarDocumento(nIdPedido){
+            const loading = this.$vs.loading()
+            let url = '/operacion/pedidos/setGenerarDocumento'
+            let params = {
+                'nIdPedido': nIdPedido
+            }
+            const config = {
+                responseType: 'blob'
+            }
+            axios.post(url, params, config)
+                .then( res => {
+                    console.log(res.data)
+                    var oMyBlob = new Blob([res.data], {type : 'application/pdf'}); // the blob
+                    let url = URL.createObjectURL(oMyBlob);
+                    window.open(url)
+                    loading.close()
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Pedido guardado exitosamente',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+                    this.$router.push({name: 'pedido.index'})
+                })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        sessionStorage.clear()
+                        location.reload()
+                        loading.close()
+                    }
+                })
+        },
         setRegistrarCliente(){
             let url = '/operacion/cliente/setRegistrarCliente'
             this.fullscreenLoading = true
@@ -479,13 +513,7 @@ export default {
             axios.post(url, params)
                 .then(res=>{
                     this.fullscreenLoading = false
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Pedido guardado exitosamente',
-                        showConfirmButton: false,
-                        timer: 1500
-                    })
-                    this.$router.push({name: 'pedido.index'})
+                    this.setGenerarDocumento(res.data)
                 })
                 .catch(error=>{
                     console.log(error.response)

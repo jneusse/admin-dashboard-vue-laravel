@@ -54,6 +54,7 @@ Route::group(['middleware' => ['auth', 'only.ajax']], function () {
 // Operacion Pedidos
     Route::get('/operacion/pedidos/getListaPedidos', 'Operacion\OrdersController@getListaPedidos');
     Route::post('/operacion/pedido/setRegistrarPedido', 'Operacion\OrdersController@setRegistrarPedido');
+    Route::post('/operacion/pedidos/setGenerarDocumento', 'Operacion\OrdersController@setGenerarDocumento');
 // Operacion Clientes
     Route::get('/operacion/cliente/getListarClientes', 'Operacion\CustomersController@getListarClientes');
     Route::post('/operacion/cliente/setRegistrarCliente', 'Operacion\CustomersController@setRegistrarCliente');

@@ -108,13 +108,13 @@
                                     <td v-text="item.estado"></td>
                                     <td>
                                         <template v-if="listRolPermisosByUsuario.includes('pedido.ver')">
-                                            <button class="btn btn-flat btn-info btn-sm">
+                                            <button class="btn btn-flat btn-info btn-sm" @click.prevent="setGenerarDocumento(item.id)">
                                                 <i class="fas fa-file-pdf"></i> Ver PDF
                                             </button>
                                         </template>
                                         <template v-if="listRolPermisosByUsuario.includes('pedido.rechazar')">
                                             <button class="btn btn-flat btn-danger btn-sm">
-                                                <i class="fas fa-trash"></i> Ver PDF
+                                                <i class="fas fa-trash"></i> Rechazar
                                             </button>
                                         </template>
                                     </td>
@@ -175,7 +175,6 @@ export default {
         }
     },
     mounted(){
-        this.getListaCategorias()
     },
     computed:{
         pageCount(){
@@ -248,6 +247,33 @@ export default {
         },
         selectPage(page){
             this.pageNumber = page
+        },
+        setGenerarDocumento(nIdPedido){
+            const loading = this.$vs.loading()
+            let url = '/operacion/pedidos/setGenerarDocumento'
+            let params = {
+                'nIdPedido': nIdPedido
+            }
+            const config = {
+                responseType: 'blob'
+            }
+            axios.post(url, params, config)
+                .then( res => {
+                    console.log(res.data)
+                    var oMyBlob = new Blob([res.data], {type : 'application/pdf'}); // the blob
+                    let url = URL.createObjectURL(oMyBlob);
+                    window.open(url)
+                    loading.close()
+                })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        sessionStorage.clear()
+                        location.reload()
+                        loading.close()
+                    }
+                })
         }
 
     }

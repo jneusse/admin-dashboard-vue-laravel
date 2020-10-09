@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Exception;
+use PDF;
 
 class OrdersController extends Controller
 {
@@ -67,6 +68,7 @@ class OrdersController extends Controller
 
             }
             DB::commit();
+            return $nIdPedido;
 
 
         } catch (Exception $e) {
@@ -78,5 +80,25 @@ class OrdersController extends Controller
 
         return $rpta;
     }
-}
+    public function setGenerarDocumento(Request $request)
+    {
+        $nIdPedido = $request->nIdPedido;
 
+        $logo = public_path('/img/avatar.png');
+
+        $rpta1 = DB::select('call sp_Pedido_getPedido( ?)', [
+            $nIdPedido
+        ]);
+
+        $rpta2 = DB::select('call sp_Pedido_getDetallePedido( ?)', [
+            $nIdPedido
+        ]);
+
+        $pdf = PDF::loadView('reportes.pedido.pdf.ver', [
+            'rpta1' => $rpta1,
+            'rpta2' => $rpta2,
+            'logo'  => $logo
+        ]);
+        return $pdf->download('invoice.pdf');
+    }
+}

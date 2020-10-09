@@ -19,3 +19,6 @@
     list-style: none;
 }
 
+.vs-input-parent{
+    width: 100% !important;
+}

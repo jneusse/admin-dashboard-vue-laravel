@@ -12,20 +12,18 @@
 
             <form method="post">
                 <div class="input-group mb-3">
-                <input type="email" v-model="fillLogin.cEmail" class="form-control" @keyup.enter="login" placeholder="Email">
-                <div class="input-group-append">
-                    <div class="input-group-text">
-                    <span class="fas fa-envelope"></span>
-                    </div>
-                </div>
+                    <vs-input icon-after type="email" :state="error ? 'danger' : ''" v-model="fillLogin.cEmail" @keyup.enter="login" placeholder="Email">
+                        <template #icon>
+                        <i class='fas fa-envelope'></i>
+                        </template>
+                    </vs-input>
                 </div>
                 <div class="input-group mb-3">
-                <input type="password" v-model="fillLogin.cContrasena" class="form-control" @keyup.enter="login" placeholder="Password">
-                <div class="input-group-append">
-                    <div class="input-group-text">
-                    <span class="fas fa-lock"></span>
-                    </div>
-                </div>
+                    <vs-input icon-after type="password" :state="error ? 'danger' : ''" v-model="fillLogin.cContrasena" @keyup.enter="login" placeholder="Password">
+                        <template #icon>
+                        <i class='fas fa-lock'></i>
+                        </template>
+                    </vs-input>
                 </div>
                 <div class="row">
                 <div class="col-8">
@@ -38,7 +36,7 @@
                 </div>
                 <!-- /.col -->
                 <div class="col-4">
-                    <button type="submit" class="btn btn-primary btn-block" @click.prevent="login" v-loading.fullscreen.lock="fullscreenLoading">Sign In</button>
+                    <button type="submit" class="btn btn-primary btn-block" @click.prevent="login">Sign In</button>
                 </div>
                 <!-- /.col -->
                 </div>
@@ -76,7 +74,6 @@ export default {
             },
             listRolPermisosByUsuario: [],
             listRolPermisosByUsuarioFilter: [],
-            fullscreenLoading: false,
             error: 0,
             mensajeError: []
         }
@@ -84,14 +81,14 @@ export default {
     methods:{
         login(){
             if(this.validarLogin()) return
-            this.fullscreenLoading = true
+            const loading = this.$vs.loading()
             var url = '/authenticate/login'
             axios.post(url,{
                 'cEmail': this.fillLogin.cEmail,
                 'cContrasena': this.fillLogin.cContrasena
             }).then(res=>{
                 console.log(res.data)
-                this.fullscreenLoading = false
+                loading.close()
                 if(res.data.code == 401){
                     this.loginFailed()
                 }
@@ -156,5 +153,8 @@ export default {
 </script>
 
 <style>
+.vs-input-parent{
+    width: 100% !important;
+}
 
 </style>
