@@ -3,6 +3,7 @@
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Sabberworm\CSS\Property\Charset;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,9 +56,17 @@ Route::group(['middleware' => ['auth', 'only.ajax']], function () {
     Route::get('/operacion/pedidos/getListaPedidos', 'Operacion\OrdersController@getListaPedidos');
     Route::post('/operacion/pedido/setRegistrarPedido', 'Operacion\OrdersController@setRegistrarPedido');
     Route::post('/operacion/pedidos/setGenerarDocumento', 'Operacion\OrdersController@setGenerarDocumento');
+    Route::post('/operacion/pedido/setCambiarEstadoPedido', 'Operacion\OrdersController@setCambiarEstadoPedido');
+    Route::get('/operacion/pedidos/setGenerarEmail', 'Operacion\OrdersController@setGenerarEmail');
 // Operacion Clientes
-    Route::get('/operacion/cliente/getListarClientes', 'Operacion\CustomersController@getListarClientes');
+    Route::get('/operacion/cliente/getListaClientes', 'Operacion\CustomersController@getListarClientes');
     Route::post('/operacion/cliente/setRegistrarCliente', 'Operacion\CustomersController@setRegistrarCliente');
+    Route::post('/operacion/cliente/setEditarCliente', 'Operacion\CustomersController@setEditarCliente');
+    // Chat
+    Route::get('/chat/getListarContactos', 'ChatsController@getListarContactos');
+    Route::get('/chat/getListarConversaciones', 'ChatsController@getListarConversaciones');
+    Route::post('/chat/setRegistrarMensaje', 'ChatsController@setRegistrarMensaje');
+
 
     Route::post('/archivo/setRegistrarArchivo', 'FilesController@setRegistrarArchivo');
 });

@@ -88,6 +88,9 @@ class UsersController extends Controller
         $oFotografia = $request->oFotografia;
         $nidAuthUser = Auth::id();
 
+        $cContrasena = ($cContrasena == NULL) ? ($cContrasena = '') : $cContrasena;
+
+
         $rpta = DB::select('call sp_Usuario_setEditarUsuario(?, ?, ?, ?, ?, ?, ?, ?, ?)', [
             $nIdUsuario,
             $cPrimerNombre,

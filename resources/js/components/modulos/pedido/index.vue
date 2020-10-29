@@ -105,7 +105,15 @@
                                     <td v-text="item.documento"></td>
                                     <td v-text="item.cliente"></td>
                                     <td v-text="item.total"></td>
-                                    <td v-text="item.estado"></td>
+                                    <td v-text="item.vendedor"></td>
+                                    <td>
+                                        <template v-if="item.state == 'A'">
+                                            <span class="badge badge-success">Activo</span>
+                                        </template>
+                                        <template v-else>
+                                            <span class="badge badge-danger">Rechazado</span>
+                                        </template>
+                                    </td>
                                     <td>
                                         <template v-if="listRolPermisosByUsuario.includes('pedido.ver')">
                                             <button class="btn btn-flat btn-info btn-sm" @click.prevent="setGenerarDocumento(item.id)">
@@ -113,7 +121,7 @@
                                             </button>
                                         </template>
                                         <template v-if="listRolPermisosByUsuario.includes('pedido.rechazar')">
-                                            <button class="btn btn-flat btn-danger btn-sm">
+                                            <button v-if="item.state == 'A'" class="btn btn-flat btn-danger btn-sm" @click.prevent="setCambiarEstado(1, item.id)">
                                                 <i class="fas fa-trash"></i> Rechazar
                                             </button>
                                         </template>
@@ -161,7 +169,7 @@ export default {
                 cDocumento: '',
                 cPedido: '',
                 cCliente: '',
-                nIdEstado: ''
+                cEstado: ''
             },
             listRolPermisosByUsuario: JSON.parse(sessionStorage.getItem('listRolPermisosByUsuario')),
             listEstados:[
@@ -175,6 +183,7 @@ export default {
         }
     },
     mounted(){
+        this.getListaPedidos()
     },
     computed:{
         pageCount(){
@@ -208,7 +217,7 @@ export default {
             this.fillBsqPedido.cDocumento= '';
             this.fillBsqPedido.cPedido= '';
             this.fillBsqPedido.cCliente= '';
-            this.fillBsqPedido.nIdEstado= '';
+            this.fillBsqPedido.cEstado= '';
         },
         limpiarBandejaUsuarios(){
             this.listEstados   = []
@@ -221,7 +230,7 @@ export default {
                 'cDocumento': this.fillBsqPedido.cDocumento,
                 'cPedido': this.fillBsqPedido.cPedido,
                 'cCliente': this.fillBsqPedido.cCliente,
-                'nIdEstado': this.fillBsqPedido.nIdEstado
+                'cEstado': this.fillBsqPedido.cEstado
             }
             axios.get(url, {params: params})
                 .then( res => {
@@ -272,6 +281,43 @@ export default {
                         sessionStorage.clear()
                         location.reload()
                         loading.close()
+                    }
+                })
+        },
+        setCambiarEstado(op, id){
+            Swal.fire({
+                    title: '¿Estás seguro de '+((op == 1) ? 'rechazar' : 'activar' )+ 'el pedido?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: ((op == 1) ? 'Si, rechazar' : 'Si, activar')
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        !this.fullscreenLoading
+                        let url = '/operacion/pedido/setCambiarEstadoPedido'
+                        axios.post(url, {
+                            'nIdPedido': id,
+                            'cEstado': (op == 1) ? 'I' : 'A'
+                        })
+                        .then(res=>{
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Se '+((op == 1) ? 'rechazó' : 'activó')+' el pedido exitosamente',
+                                showConfirmButton: false,
+                                timer: 1500
+                            })
+                            this.getListaPedidos()
+                        })
+                        .catch(error=>{
+                            console.log(error.response)
+                            if(error.response.status == 401){
+                                this.$router.push({name: 'login'})
+                                location.reload()
+                                sessionStorage.clear()
+                                this.fullscreenLoading = false
+                            }
+                        })
                     }
                 })
         }

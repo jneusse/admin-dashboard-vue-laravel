@@ -109,6 +109,23 @@ export const rutas = [
         }
     },
     {
+        path: '/cliente/crear',
+        name: 'cliente.crear',
+        component: require('./components/modulos/cliente/create.vue').default,
+        beforeEnter: (to, from, next) => {
+            verificarAcceso(to, from, next)
+        }
+    },
+    {
+        path: '/cliente/editar/:id',
+        name: 'cliente.editar',
+        component: require('./components/modulos/cliente/edit.vue').default,
+        props: true,
+        beforeEnter: (to, from, next) => {
+            verificarAcceso(to, from, next)
+        }
+    },
+    {
         path: '/pedido',
         name: 'pedido.index',
         component: require('./components/modulos/pedido/index.vue').default,

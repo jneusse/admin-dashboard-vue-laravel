@@ -164,7 +164,7 @@
                                                     <td>
                                                         <el-input-number v-model="item.nStock" controls-position="right"
                                                             :min="1"
-                                                            :max="(item.nStock) ? item.nStockFlag : 1"></el-input-number>
+                                                            :max="item.nStockFlag"></el-input-number>
                                                     </td>
                                                     <td v-text="item.fPrecio"></td>
                                                     <td>{{ item.fSubtotal = item.fPrecio * item.nStock}}</td>
@@ -240,7 +240,6 @@ export default {
             listPermisos:[],
             listPedidos:[],
             listProductos:[],
-            form: new FormData,
             fullscreenLoading: false,
             modalShow: false,
             mostrarModal:{
@@ -347,7 +346,7 @@ export default {
 
         },
         getListarClientes(){
-                let url = '/operacion/cliente/getListarClientes'
+                let url = '/operacion/cliente/getListaClientes'
                 axios.get(url)
                     .then(res=>{
                         this.listClientes = res.data
@@ -377,8 +376,8 @@ export default {
             if(this.listPedidos.length == 0){
                 this.listPedidos.push({
                     'nIdProducto': '',
-                    'nStock': '',
-                    'nStockFlag': '',
+                    'nStock': 0,
+                    'nStockFlag': 0,
                     'fPrecio': '',
                     'fSubtotal': '',
                 })
@@ -400,8 +399,8 @@ export default {
                 if(count == 0){
                     this.listPedidos.push({
                         'nIdArticulo': '',
-                        'nStock': '',
-                        'nStockFlag': '',
+                        'nStock': 0,
+                        'nStockFlag': 0,
                         'fPrecio': '',
                         'fSubtotal': '',
                     })
@@ -513,7 +512,7 @@ export default {
             axios.post(url, params)
                 .then(res=>{
                     this.fullscreenLoading = false
-                    this.setGenerarDocumento(res.data)
+                    this.setGenerarEmail(res.data)
                 })
                 .catch(error=>{
                     console.log(error.response)
@@ -559,6 +558,26 @@ export default {
                 this.error = true
             }
             return this.error
+        },
+        setGenerarEmail(nIdPedido){
+            let url = '/operacion/pedidos/setGenerarEmail'
+            let params = {
+                'nIdPedido': nIdPedido
+            }
+            axios.get(url, {params: params})
+                .then( res => {
+                    console.log(res.data);
+                    this.setGenerarDocumento(nIdPedido)
+                })
+                .catch(error=>{
+                    console.log(error.response)
+                    if(error.response.status == 401){
+                        this.$router.push({name: 'login'})
+                        sessionStorage.clear()
+                        location.reload()
+                        loading.close()
+                    }
+                })
         }
     }
 }
