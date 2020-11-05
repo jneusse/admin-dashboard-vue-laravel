@@ -40,6 +40,7 @@
             EventBus.$on('verifyAuthenticatedUser', data => {
                 this.authUser = data;
             })
+            
         }
     }
 </script>

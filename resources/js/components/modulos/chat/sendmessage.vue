@@ -1,9 +1,9 @@
 <template>
     <form action="#" method="post">
         <div class="input-group">
-            <input type="text" v-model="message" placeholder="Type Message ..." class="form-control" @keydown.enter.prevent="setRegistrarMensaje" @keydown="escribiendoMensaje">
+            <input type="text" v-model="message" placeholder="Type Message ..." class="form-control"  @keydown.enter.prevent="setRegistrarMensaje" @keydown="escribiendoMensaje" :readyonly="(!contacto) ? true : false">
             <span class="input-group-append">
-            <button type="button" class="btn btn-primary" @click="setRegistrarMensaje">Send</button>
+            <button type="button" class="btn btn-primary" :readyonly="(!contacto) ? true : false" @click="setRegistrarMensaje">Send</button>
             </span>
         </div>
     </form>
@@ -37,6 +37,12 @@ export default {
               })
         },
         escribiendoMensaje(){
+          if(!this.message){
+              return
+          }
+          if(!this.contacto){
+              return
+          }
           Echo.private('escribiendo')
             .whisper('typing', {
               usuario: this.usuario.id,

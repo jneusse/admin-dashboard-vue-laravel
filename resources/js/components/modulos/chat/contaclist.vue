@@ -43,10 +43,6 @@ export default {
         }
     },
     mounted(){
-      setInterval(()=>{
-        this.typing.state = false
-        console.log(this.typing.state);
-      }, 2000)
     },
     computed:{
       filterContactos(){

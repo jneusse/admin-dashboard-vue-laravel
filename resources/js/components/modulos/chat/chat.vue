@@ -114,6 +114,12 @@ export default {
             this.setNuevoMensaje(mensaje)
           }
 
+          var sound = new Howl({
+            src: ['/ringtones/message.mp3']
+          });
+
+          sound.play();
+
           const noti = this.$vs.notification({
               border: true,
               position: 'top-center',

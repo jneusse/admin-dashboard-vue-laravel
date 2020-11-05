@@ -21,6 +21,9 @@ window.Swal = Swal;
 
 import Vuesax from 'vuesax'
 
+import Howler from 'howler'
+window.Howler = Howler
+
 import 'vuesax/dist/vuesax.css' //Vuesax styles
 Vue.use(Vuesax, {
   // options here
