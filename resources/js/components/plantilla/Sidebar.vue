@@ -150,6 +150,13 @@ export default {
             fullscreenLoading: false
         }
     },
+    mounted(){
+      Echo.private(`logout.user.${this.usuario.id}`)
+        .listen('Logout', (e) => {
+          console.log('logout');
+          this.logout()
+        })
+    },
     methods:{
         logout(){
             this.fullscreenLoading = true

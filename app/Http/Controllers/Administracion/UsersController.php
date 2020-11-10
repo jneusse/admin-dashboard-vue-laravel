@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use App\Events\Logout;
 
 
 class UsersController extends Controller
@@ -122,6 +123,9 @@ class UsersController extends Controller
             $cEstado,
             $nidAuthUser
         ]);
+        if($cEstado == 'I'){
+          broadcast(new Logout($nIdUsuario));
+        }
 
         return $rpta;
     }
