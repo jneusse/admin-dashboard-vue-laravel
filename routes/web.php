@@ -67,6 +67,10 @@ Route::group(['middleware' => ['auth', 'only.ajax']], function () {
     Route::get('/chat/getListarConversaciones', 'ChatsController@getListarConversaciones');
     Route::post('/chat/setRegistrarMensaje', 'ChatsController@setRegistrarMensaje');
 
+    Route::get('/reporte/pedidos/getListaPedidos', 'ReportesController@getListaPedidos');
+    Route::get('/reporte/pedidos/export', 'ReportesController@export');
+
+
 
     Route::post('/archivo/setRegistrarArchivo', 'FilesController@setRegistrarArchivo');
 });
